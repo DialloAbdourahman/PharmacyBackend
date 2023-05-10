@@ -9,3 +9,70 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model SystemAdmin {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  password  String
+  title     UserType @relation(fields: [titleName], references: [name])
+  titleName String
+}
+
+model PharmacyAdmin {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  password  String
+  title     UserType @relation(fields: [titleName], references: [name])
+  titleName String
+}
+
+model Cachier {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  password  String
+  title     UserType @relation(fields: [titleName], references: [name])
+  titleName String
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  password  String
+  title     UserType @relation(fields: [titleName], references: [name])
+  titleName String
+}
+
+model UserType {
+  name           String          @id
+  description    String?
+  SystemAdmins   SystemAdmin[]
+  PharmacyAdmins PharmacyAdmin[]
+  Cachiers       Cachier[]
+  Customers      Customer[]
+}
+
+model Pharmacy {
+  id          String @id @default(uuid())
+  name        String
+  email       String
+  phoneNumber String
+  address     String
+  hourly      String
+}
+
+model PharmaceuticalProduct {
+  id   String @id @default(uuid())
+  name String
+}
+
+model Complain {
+  id      String @id @default(uuid())
+  title   String
+  message String
+}
+
+// Include pharmacy, pharmacy admin, cachier created by to know who created who
