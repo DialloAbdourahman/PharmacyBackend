@@ -1,13 +1,18 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 const router = express.Router();
 
 // Importing controllers
-const { createSystemAdmin } = require('../controllers/systemAdminController');
+const {
+  createSystemAdmin,
+  loginSystemAdmin,
+} = require('../controllers/systemAdminController');
 
 // Additional imports
+const { authSystemAdmin } = require('../middlewares/auth');
 
 // CREATE ROUTES
-router.post('/', createSystemAdmin);
+router.post('/login', loginSystemAdmin);
+router.post('/', authSystemAdmin, createSystemAdmin);
 
 // READ ROUTES
 
