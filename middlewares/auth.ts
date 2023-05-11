@@ -7,6 +7,7 @@ const prisma: PrismaClient<
   Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
 > = require('../utils/prismaClient');
 
+// to reuse this, change the process.env for the secrete key, change the decoded.data.titleName and that is all.
 const authSystemAdmin = async (
   req: Request,
   res: Response,
@@ -14,16 +15,21 @@ const authSystemAdmin = async (
 ) => {
   try {
     // Get the token and decode it.
-    const token: any = req.header('Authorization')?.replace('Bearer ', '');
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_SYSTEM_ADMIN);
+    const accessToken: any = req
+      .header('Authorization')
+      ?.replace('Bearer ', '');
+    const decoded = jwt.verify(
+      accessToken,
+      process.env.JWT_ACCESS_TOKEN_SECRET_SYSTEM_ADMIN
+    );
 
-    // Decode the token
+    // Decode the accessToken
     if (decoded.data.titleName !== 'system_admin') {
       throw new Error();
     }
 
     // Attack the user's data to the request object.
-    req.user = { ...decoded.data, token };
+    req.user = { ...decoded.data };
 
     // Run the next funtions so that the next function can be executed.
     next();

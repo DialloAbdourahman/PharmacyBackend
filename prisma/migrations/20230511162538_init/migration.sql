@@ -1,11 +1,14 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE "SystemAdmin" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "titleName" TEXT NOT NULL,
+    "refreshToken" TEXT NOT NULL,
 
-  - Added the required column `titleName` to the `SystemAdmin` table without a default value. This is not possible if the table is not empty.
-
-*/
--- AlterTable
-ALTER TABLE "SystemAdmin" ADD COLUMN     "titleName" TEXT NOT NULL;
+    CONSTRAINT "SystemAdmin_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "PharmacyAdmin" (
@@ -14,6 +17,7 @@ CREATE TABLE "PharmacyAdmin" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "titleName" TEXT NOT NULL,
+    "refreshToken" TEXT NOT NULL,
 
     CONSTRAINT "PharmacyAdmin_pkey" PRIMARY KEY ("id")
 );
@@ -25,6 +29,7 @@ CREATE TABLE "Cachier" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "titleName" TEXT NOT NULL,
+    "refreshToken" TEXT NOT NULL,
 
     CONSTRAINT "Cachier_pkey" PRIMARY KEY ("id")
 );
@@ -36,6 +41,7 @@ CREATE TABLE "Customer" (
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "titleName" TEXT NOT NULL,
+    "refreshToken" TEXT NOT NULL,
 
     CONSTRAINT "Customer_pkey" PRIMARY KEY ("id")
 );
@@ -76,6 +82,18 @@ CREATE TABLE "Complain" (
 
     CONSTRAINT "Complain_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "SystemAdmin_email_key" ON "SystemAdmin"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "PharmacyAdmin_email_key" ON "PharmacyAdmin"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Cachier_email_key" ON "Cachier"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Customer_email_key" ON "Customer"("email");
 
 -- AddForeignKey
 ALTER TABLE "SystemAdmin" ADD CONSTRAINT "SystemAdmin_titleName_fkey" FOREIGN KEY ("titleName") REFERENCES "UserType"("name") ON DELETE RESTRICT ON UPDATE CASCADE;

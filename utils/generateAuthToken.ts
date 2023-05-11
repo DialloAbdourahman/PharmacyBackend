@@ -6,11 +6,20 @@ const prisma: PrismaClient<
 > = require('./prismaClient');
 const jwt = require('jsonwebtoken');
 
-const generateAuthTokenForSystemAdmin = async (data: any) => {
-  const token = jwt.sign({ data }, process.env.JWT_SECRET_SYSTEM_ADMIN, {
-    expiresIn: '5s',
+const generateAccessToken = async (data: any, secrete: string) => {
+  const token = jwt.sign({ data }, secrete, {
+    expiresIn: '1hr',
   });
   return token;
 };
 
-module.exports = { generateAuthTokenForSystemAdmin };
+const generateRefreshToken = async (
+  data: any,
+  secrete: string,
+  table: string
+) => {
+  const token = jwt.sign({ data }, secrete);
+  return token;
+};
+
+module.exports = { generateAccessToken, generateRefreshToken };

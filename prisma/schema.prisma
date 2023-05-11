@@ -11,39 +11,43 @@ datasource db {
 }
 
 model SystemAdmin {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  title     UserType @relation(fields: [titleName], references: [name])
-  titleName String
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  title        UserType @relation(fields: [titleName], references: [name])
+  titleName    String
+  refreshToken String?
 }
 
 model PharmacyAdmin {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  title     UserType @relation(fields: [titleName], references: [name])
-  titleName String
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  title        UserType @relation(fields: [titleName], references: [name])
+  titleName    String
+  refreshToken String?
 }
 
 model Cachier {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  title     UserType @relation(fields: [titleName], references: [name])
-  titleName String
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  title        UserType @relation(fields: [titleName], references: [name])
+  titleName    String
+  refreshToken String?
 }
 
 model Customer {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
-  title     UserType @relation(fields: [titleName], references: [name])
-  titleName String
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  title        UserType @relation(fields: [titleName], references: [name])
+  titleName    String
+  refreshToken String?
 }
 
 model UserType {
@@ -74,5 +78,7 @@ model Complain {
   title   String
   message String
 }
+
+// npx prisma migrate dev --name init
 
 // Include pharmacy, pharmacy admin, cachier created by to know who created who
