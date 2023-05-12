@@ -4,8 +4,8 @@ CREATE TABLE "SystemAdmin" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "titleName" TEXT NOT NULL,
-    "refreshToken" TEXT NOT NULL,
+    "titleName" TEXT NOT NULL DEFAULT 'system_admin',
+    "refreshToken" TEXT,
 
     CONSTRAINT "SystemAdmin_pkey" PRIMARY KEY ("id")
 );
@@ -16,8 +16,9 @@ CREATE TABLE "PharmacyAdmin" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "titleName" TEXT NOT NULL,
-    "refreshToken" TEXT NOT NULL,
+    "titleName" TEXT NOT NULL DEFAULT 'pharmacy_admin',
+    "refreshToken" TEXT,
+    "associatedPharmacy" TEXT NOT NULL,
 
     CONSTRAINT "PharmacyAdmin_pkey" PRIMARY KEY ("id")
 );
@@ -28,8 +29,8 @@ CREATE TABLE "Cachier" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "titleName" TEXT NOT NULL,
-    "refreshToken" TEXT NOT NULL,
+    "titleName" TEXT NOT NULL DEFAULT 'cachier',
+    "refreshToken" TEXT,
 
     CONSTRAINT "Cachier_pkey" PRIMARY KEY ("id")
 );
@@ -40,8 +41,8 @@ CREATE TABLE "Customer" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "titleName" TEXT NOT NULL,
-    "refreshToken" TEXT NOT NULL,
+    "titleName" TEXT NOT NULL DEFAULT 'customer',
+    "refreshToken" TEXT,
 
     CONSTRAINT "Customer_pkey" PRIMARY KEY ("id")
 );
@@ -62,6 +63,7 @@ CREATE TABLE "Pharmacy" (
     "phoneNumber" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "hourly" TEXT NOT NULL,
+    "allNight" BOOLEAN NOT NULL,
 
     CONSTRAINT "Pharmacy_pkey" PRIMARY KEY ("id")
 );
@@ -95,11 +97,23 @@ CREATE UNIQUE INDEX "Cachier_email_key" ON "Cachier"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "Customer_email_key" ON "Customer"("email");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Pharmacy_name_key" ON "Pharmacy"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Pharmacy_email_key" ON "Pharmacy"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Pharmacy_phoneNumber_key" ON "Pharmacy"("phoneNumber");
+
 -- AddForeignKey
 ALTER TABLE "SystemAdmin" ADD CONSTRAINT "SystemAdmin_titleName_fkey" FOREIGN KEY ("titleName") REFERENCES "UserType"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "PharmacyAdmin" ADD CONSTRAINT "PharmacyAdmin_titleName_fkey" FOREIGN KEY ("titleName") REFERENCES "UserType"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PharmacyAdmin" ADD CONSTRAINT "PharmacyAdmin_associatedPharmacy_fkey" FOREIGN KEY ("associatedPharmacy") REFERENCES "Pharmacy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Cachier" ADD CONSTRAINT "Cachier_titleName_fkey" FOREIGN KEY ("titleName") REFERENCES "UserType"("name") ON DELETE RESTRICT ON UPDATE CASCADE;

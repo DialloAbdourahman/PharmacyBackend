@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -68,6 +65,7 @@ model Pharmacy {
   phoneNumber    String          @unique
   address        String
   hourly         String
+  allNight       Boolean
   pharmacyAdmins PharmacyAdmin[]
 }
 
@@ -84,6 +82,4 @@ model Complain {
 
 // npx prisma migrate dev --name init
 
-// include "pharmacy de garde boolean"
-// manage the login with access and refresh tokens on postman so that they can be set automatically damn
-// Include pharmacy, pharmacy admin, cachier created by to know who created who
+// Add creator for pharmacy admin (system admin), cahier (pharmacy admin), pharmacy (system admin) and maybe even pharmaceutical product (pharmacy admin).
