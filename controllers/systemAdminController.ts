@@ -49,7 +49,6 @@ const createSystemAdmin = async (req: Request, res: Response) => {
         name,
         email,
         password,
-        titleName: 'system_admin',
       },
     });
 
@@ -110,7 +109,7 @@ const loginSystemAdmin = async (req: Request, res: Response) => {
     );
 
     // Generate refresh token and store it in database.
-    const refreshToken = await generateAccessToken(
+    const refreshToken = await generateRefreshToken(
       dataToGenerateAuthToken,
       process.env.JWT_REFRESH_TOKEN_SECRET_SYSTEM_ADMIN
     );
@@ -201,4 +200,138 @@ const refreshToken = async (req: Request, res: Response) => {
   }
 };
 
-module.exports = { createSystemAdmin, loginSystemAdmin, refreshToken, logout };
+const deleteSystemAdmin = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the system admin to be deleted from the request params
+    const { id } = req.params;
+
+    // Delete the system admin
+    await prisma.systemAdmin.delete({
+      where: {
+        id,
+      },
+    });
+
+    // Send a positive response back
+    return res
+      .status(200)
+      .json({ message: 'System admin has been deleted successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const createPharmacy = async (req: Request, res: Response) => {
+  try {
+    // Get all required data from request body.
+    let {
+      pharmacyName,
+      pharmacyEmail,
+      pharmacyPhoneNumber,
+      pharmacyAddress,
+      pharmacyHourly,
+      pharmacyAdminName,
+      pharmacyAdminEmail,
+      pharmacyAdminPassword,
+    } = req.body;
+
+    // Check if all fields are presendt
+    if (
+      !pharmacyName ||
+      !pharmacyAdminEmail ||
+      !pharmacyPhoneNumber ||
+      !pharmacyAddress ||
+      !pharmacyHourly ||
+      !pharmacyAdminName ||
+      !pharmacyAdminEmail ||
+      !pharmacyAdminPassword
+    ) {
+      return res.status(400).json({ message: 'Please enter all fields' });
+    }
+
+    // Validate both emails
+    if (
+      !validator.isEmail(pharmacyEmail) ||
+      !validator.isEmail(pharmacyAdminEmail)
+    ) {
+      return res.status(400).json({ message: 'Invalid Email' });
+    }
+
+    // Check if there is a pharmacy with this credentials exists already
+    const pharmacy = await prisma.pharmacy.findFirst({
+      where: {
+        OR: [
+          {
+            name: {
+              equals: pharmacyName,
+            },
+          },
+          {
+            email: {
+              equals: pharmacyEmail,
+            },
+          },
+          {
+            phoneNumber: {
+              equals: pharmacyPhoneNumber,
+            },
+          },
+        ],
+      },
+    });
+    if (pharmacy) {
+      return res
+        .status(400)
+        .json({ message: 'Credentials exists already for another pharmacy' });
+    }
+
+    // Check if there is a pharmacyAdmin with this email
+    const pharmacyAdmin = await prisma.pharmacyAdmin.findUnique({
+      where: {
+        email: pharmacyAdminEmail,
+      },
+    });
+    if (pharmacyAdmin) {
+      return res
+        .status(400)
+        .json({ message: 'Email already used for another pharmacy admin' });
+    }
+
+    // Hash the password of the pharmacy admin
+    pharmacyAdminPassword = await bcrypt.hash(pharmacyAdminPassword, 8);
+
+    // Create the pharmacy with its pharmacy admin
+    await prisma.pharmacy.create({
+      data: {
+        name: pharmacyName,
+        email: pharmacyEmail,
+        phoneNumber: pharmacyPhoneNumber,
+        address: pharmacyAddress,
+        hourly: pharmacyHourly,
+        pharmacyAdmins: {
+          create: {
+            name: pharmacyAdminName,
+            email: pharmacyAdminEmail,
+            password: pharmacyAdminPassword,
+          },
+        },
+      },
+    });
+
+    // Send back positive response
+    return res.status(201).json({
+      message: 'Pharmacy with its pharmacy admin has been created successfully',
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+module.exports = {
+  createSystemAdmin,
+  loginSystemAdmin,
+  refreshToken,
+  logout,
+  deleteSystemAdmin,
+  createPharmacy,
+};

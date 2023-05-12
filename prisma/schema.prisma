@@ -16,18 +16,20 @@ model SystemAdmin {
   email        String   @unique
   password     String
   title        UserType @relation(fields: [titleName], references: [name])
-  titleName    String
+  titleName    String   @default("system_admin")
   refreshToken String?
 }
 
 model PharmacyAdmin {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  password     String
-  title        UserType @relation(fields: [titleName], references: [name])
-  titleName    String
-  refreshToken String?
+  id                 String   @id @default(uuid())
+  name               String
+  email              String   @unique
+  password           String
+  title              UserType @relation(fields: [titleName], references: [name])
+  titleName          String   @default("pharmacy_admin")
+  refreshToken       String?
+  pharmacy           Pharmacy @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
+  associatedPharmacy String
 }
 
 model Cachier {
@@ -36,7 +38,7 @@ model Cachier {
   email        String   @unique
   password     String
   title        UserType @relation(fields: [titleName], references: [name])
-  titleName    String
+  titleName    String   @default("cachier")
   refreshToken String?
 }
 
@@ -46,7 +48,7 @@ model Customer {
   email        String   @unique
   password     String
   title        UserType @relation(fields: [titleName], references: [name])
-  titleName    String
+  titleName    String   @default("customer")
   refreshToken String?
 }
 
@@ -54,18 +56,19 @@ model UserType {
   name           String          @id
   description    String?
   SystemAdmins   SystemAdmin[]
-  PharmacyAdmins PharmacyAdmin[]
-  Cachiers       Cachier[]
-  Customers      Customer[]
+  pharmacyAdmins PharmacyAdmin[]
+  cachiers       Cachier[]
+  customers      Customer[]
 }
 
 model Pharmacy {
-  id          String @id @default(uuid())
-  name        String
-  email       String
-  phoneNumber String
-  address     String
-  hourly      String
+  id             String          @id @default(uuid())
+  name           String          @unique
+  email          String          @unique
+  phoneNumber    String          @unique
+  address        String
+  hourly         String
+  pharmacyAdmins PharmacyAdmin[]
 }
 
 model PharmaceuticalProduct {
@@ -81,4 +84,6 @@ model Complain {
 
 // npx prisma migrate dev --name init
 
+// include "pharmacy de garde boolean"
+// manage the login with access and refresh tokens on postman so that they can be set automatically damn
 // Include pharmacy, pharmacy admin, cachier created by to know who created who

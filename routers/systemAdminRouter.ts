@@ -7,21 +7,25 @@ const {
   loginSystemAdmin,
   refreshToken,
   logout,
+  deleteSystemAdmin,
+  createPharmacy,
 } = require('../controllers/systemAdminController');
 
 // Additional imports
-const { authSystemAdmin } = require('../middlewares/auth');
+const { authSystemAdmin: auth } = require('../middlewares/auth');
 
 // CREATE ROUTES
 router.post('/login', loginSystemAdmin);
 router.post('/token', refreshToken);
-router.post('/logout', authSystemAdmin, logout);
-router.post('/', authSystemAdmin, createSystemAdmin);
+router.post('/logout', auth, logout);
+router.post('/pharmacy', auth, createPharmacy);
+router.post('/', auth, createSystemAdmin);
 
 // READ ROUTES
 
 // UPDATE ROUTES
 
 // DELETE ROUTES
+router.delete('/:id', auth, deleteSystemAdmin);
 
 module.exports = router;

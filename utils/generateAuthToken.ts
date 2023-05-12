@@ -13,11 +13,7 @@ const generateAccessToken = async (data: any, secrete: string) => {
   return token;
 };
 
-const generateRefreshToken = async (
-  data: any,
-  secrete: string,
-  table: string
-) => {
+const generateRefreshToken = async (data: any, secrete: string) => {
   const token = jwt.sign({ data }, secrete);
   return token;
 };
