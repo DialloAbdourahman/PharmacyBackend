@@ -8,35 +8,55 @@ datasource db {
 }
 
 model SystemAdmin {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  password     String
-  title        UserType @relation(fields: [titleName], references: [name])
-  titleName    String   @default("system_admin")
-  refreshToken String?
+  id                String     @id @default(uuid())
+  name              String
+  email             String     @unique
+  password          String
+  title             UserType   @relation(fields: [titleName], references: [name])
+  titleName         String     @default("system_admin")
+  refreshToken      String?
+  pharmaciesCreated Pharmacy[]
 }
 
 model PharmacyAdmin {
-  id                 String   @id @default(uuid())
-  name               String
-  email              String   @unique
-  password           String
-  title              UserType @relation(fields: [titleName], references: [name])
-  titleName          String   @default("pharmacy_admin")
-  refreshToken       String?
-  pharmacy           Pharmacy @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
-  associatedPharmacy String
-}
-
-model Cachier {
   id           String   @id @default(uuid())
   name         String
   email        String   @unique
   password     String
   title        UserType @relation(fields: [titleName], references: [name])
-  titleName    String   @default("cachier")
+  titleName    String   @default("pharmacy_admin")
   refreshToken String?
+
+  pharmacy           Pharmacy @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
+  associatedPharmacy String   @unique
+
+  pharmacyManagersCreated PharmacyManager[]
+  cachiersCreated         Cachier[]
+}
+
+model PharmacyManager {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  title        UserType @relation(fields: [titleName], references: [name])
+  titleName    String   @default("pharmacy_manager")
+  refreshToken String?
+
+  pharmacyAdminCreator PharmacyAdmin @relation(fields: [creator], references: [id])
+  creator              String
+}
+
+model Cachier {
+  id                   String        @id @default(uuid())
+  name                 String
+  email                String        @unique
+  password             String
+  title                UserType      @relation(fields: [titleName], references: [name])
+  titleName            String        @default("cachier")
+  refreshToken         String?
+  pharmacyAdminCreator PharmacyAdmin @relation(fields: [creator], references: [id], onDelete: Cascade)
+  creator              String
 }
 
 model Customer {
@@ -50,23 +70,26 @@ model Customer {
 }
 
 model UserType {
-  name           String          @id
-  description    String?
-  SystemAdmins   SystemAdmin[]
-  pharmacyAdmins PharmacyAdmin[]
-  cachiers       Cachier[]
-  customers      Customer[]
+  name             String            @id
+  description      String?
+  SystemAdmins     SystemAdmin[]
+  pharmacyAdmins   PharmacyAdmin[]
+  pharmacyManagers PharmacyManager[]
+  cachiers         Cachier[]
+  customers        Customer[]
 }
 
 model Pharmacy {
-  id             String          @id @default(uuid())
-  name           String          @unique
-  email          String          @unique
-  phoneNumber    String          @unique
-  address        String
-  hourly         String
-  allNight       Boolean
-  pharmacyAdmins PharmacyAdmin[]
+  id                 String         @id @default(uuid())
+  name               String         @unique
+  email              String         @unique
+  phoneNumber        String         @unique
+  address            String
+  hourly             String
+  allNight           Boolean
+  pharmacyAdmin      PharmacyAdmin?
+  systemAdminCreator SystemAdmin    @relation(fields: [creator], references: [id])
+  creator            String
 }
 
 model PharmaceuticalProduct {
@@ -82,4 +105,4 @@ model Complain {
 
 // npx prisma migrate dev --name init
 
-// Add creator for pharmacy admin (system admin), cahier (pharmacy admin), pharmacy (system admin) and maybe even pharmaceutical product (pharmacy admin).
+// Delete pharmacy route and on delete cascade.

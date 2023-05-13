@@ -260,7 +260,7 @@ const createPharmacy = async (req: Request, res: Response) => {
     }
 
     // Check if there is a pharmacy with this credentials exists already
-    const pharmacy = await prisma.pharmacy.findFirst({
+    const foundPharmacy = await prisma.pharmacy.findFirst({
       where: {
         OR: [
           {
@@ -281,7 +281,7 @@ const createPharmacy = async (req: Request, res: Response) => {
         ],
       },
     });
-    if (pharmacy) {
+    if (foundPharmacy) {
       return res
         .status(400)
         .json({ message: 'Credentials exists already for another pharmacy' });
@@ -302,7 +302,7 @@ const createPharmacy = async (req: Request, res: Response) => {
     // Hash the password of the pharmacy admin
     pharmacyAdminPassword = await bcrypt.hash(pharmacyAdminPassword, 8);
 
-    // Create the pharmacy with its pharmacy admin
+    // Create the pharmacy with it's pharmacy admin
     await prisma.pharmacy.create({
       data: {
         name: pharmacyName,
@@ -311,7 +311,8 @@ const createPharmacy = async (req: Request, res: Response) => {
         address: pharmacyAddress,
         hourly: pharmacyHourly,
         allNight: pharmacyAllNight,
-        pharmacyAdmins: {
+        creator: req.user.id,
+        pharmacyAdmin: {
           create: {
             name: pharmacyAdminName,
             email: pharmacyAdminEmail,
