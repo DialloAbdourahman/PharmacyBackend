@@ -8,14 +8,17 @@ datasource db {
 }
 
 model SystemAdmin {
-  id                String     @id @default(uuid())
-  name              String
-  email             String     @unique
-  password          String
-  title             UserType   @relation(fields: [titleName], references: [name])
-  titleName         String     @default("system_admin")
-  refreshToken      String?
-  pharmaciesCreated Pharmacy[]
+  id                  String        @id @default(uuid())
+  name                String
+  email               String        @unique
+  password            String
+  title               UserType      @relation(fields: [titleName], references: [name])
+  titleName           String        @default("system_admin")
+  refreshToken        String?
+  systemAdminCreator  SystemAdmin?  @relation(fields: [creator], references: [id], name: "system admins created")
+  creator             String?
+  systemAdminsCreated SystemAdmin[] @relation("system admins created")
+  pharmaciesCreated   Pharmacy[]
 }
 
 model PharmacyAdmin {
@@ -105,4 +108,5 @@ model Complain {
 
 // npx prisma migrate dev --name init
 
+// Remove the create pharmacy route and put it on the pharmacy route instead of the systemadmin route.
 // Delete pharmacy route and on delete cascade.

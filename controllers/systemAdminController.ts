@@ -49,6 +49,7 @@ const createSystemAdmin = async (req: Request, res: Response) => {
         name,
         email,
         password,
+        creator: req.user.id,
       },
     });
 
@@ -205,6 +206,17 @@ const deleteSystemAdmin = async (req: Request, res: Response) => {
     // Get the id of the system admin to be deleted from the request params
     const { id } = req.params;
 
+    // Check if you wanna delete the main system admin
+    const systemAdminToBeDeleted = await prisma.systemAdmin.findUnique({
+      where: { id },
+    });
+
+    if (systemAdminToBeDeleted?.creator === null) {
+      return res
+        .status(400)
+        .json({ message: 'Sorry you cannot delete the main system admin.' });
+    }
+
     // Delete the system admin
     await prisma.systemAdmin.delete({
       where: {
@@ -221,111 +233,80 @@ const deleteSystemAdmin = async (req: Request, res: Response) => {
   }
 };
 
-const createPharmacy = async (req: Request, res: Response) => {
+const updateSystemAdmin = async (req: Request, res: Response) => {
   try {
-    // Get all required data from request body.
-    let {
-      pharmacyName,
-      pharmacyEmail,
-      pharmacyPhoneNumber,
-      pharmacyAddress,
-      pharmacyHourly,
-      pharmacyAdminName,
-      pharmacyAdminEmail,
-      pharmacyAdminPassword,
-      pharmacyAllNight,
-    } = req.body;
+    // Get the enteries and create a valid enteries array
+    const enteries = Object.keys(req.body);
 
-    // Check if all fields are presendt
-    if (
-      !pharmacyName ||
-      !pharmacyAdminEmail ||
-      !pharmacyPhoneNumber ||
-      !pharmacyAddress ||
-      !pharmacyHourly ||
-      !pharmacyAdminName ||
-      !pharmacyAdminEmail ||
-      !pharmacyAdminPassword ||
-      !pharmacyAllNight
-    ) {
-      return res.status(400).json({ message: 'Please enter all fields' });
+    if (enteries.length < 1) {
+      return res.status(400).json({ message: 'Please provide data to us.' });
     }
 
-    // Validate both emails
-    if (
-      !validator.isEmail(pharmacyEmail) ||
-      !validator.isEmail(pharmacyAdminEmail)
-    ) {
-      return res.status(400).json({ message: 'Invalid Email' });
-    }
+    const allowedEntery = ['name', 'email', 'password'];
 
-    // Check if there is a pharmacy with this credentials exists already
-    const foundPharmacy = await prisma.pharmacy.findFirst({
-      where: {
-        OR: [
-          {
-            name: {
-              equals: pharmacyName,
-            },
-          },
-          {
-            email: {
-              equals: pharmacyEmail,
-            },
-          },
-          {
-            phoneNumber: {
-              equals: pharmacyPhoneNumber,
-            },
-          },
-        ],
-      },
+    // Check if the enteries are valid
+    const isValidOperation = enteries.every((entery) => {
+      return allowedEntery.includes(entery);
     });
-    if (foundPharmacy) {
-      return res
-        .status(400)
-        .json({ message: 'Credentials exists already for another pharmacy' });
+
+    // Send negative response if the enteries are not allowed.
+    if (!isValidOperation) {
+      res.status(400).send({
+        message: 'You are trying to update data you are not allowed to',
+      });
+      return;
     }
 
-    // Check if there is a pharmacyAdmin with this email
-    const pharmacyAdmin = await prisma.pharmacyAdmin.findUnique({
+    // Check if the password should be updated and then encrypt it.
+    const passwordUpdate = enteries.find((entery) => entery === 'password');
+    if (passwordUpdate) {
+      req.body.password = await bcrypt.hash(req.body.password, 8);
+    }
+
+    // Update the system admin's information.
+    await prisma.systemAdmin.update({
       where: {
-        email: pharmacyAdminEmail,
+        id: req.user.id,
       },
-    });
-    if (pharmacyAdmin) {
-      return res
-        .status(400)
-        .json({ message: 'Email already used for another pharmacy admin' });
-    }
-
-    // Hash the password of the pharmacy admin
-    pharmacyAdminPassword = await bcrypt.hash(pharmacyAdminPassword, 8);
-
-    // Create the pharmacy with it's pharmacy admin
-    await prisma.pharmacy.create({
       data: {
-        name: pharmacyName,
-        email: pharmacyEmail,
-        phoneNumber: pharmacyPhoneNumber,
-        address: pharmacyAddress,
-        hourly: pharmacyHourly,
-        allNight: pharmacyAllNight,
-        creator: req.user.id,
-        pharmacyAdmin: {
-          create: {
-            name: pharmacyAdminName,
-            email: pharmacyAdminEmail,
-            password: pharmacyAdminPassword,
+        ...req.body,
+      },
+    });
+
+    // Send back a positive response
+    res
+      .status(201)
+      .json({ message: 'Your credentials have been updated successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const allSystemAdmins = async (req: Request, res: Response) => {
+  try {
+    // Get all the system admins
+    const systemAdmins = await prisma.systemAdmin.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        titleName: true,
+        creator: true,
+        pharmaciesCreated: true,
+        systemAdminsCreated: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            titleName: true,
+            creator: true,
           },
         },
       },
     });
 
-    // Send back positive response
-    return res.status(201).json({
-      message: 'Pharmacy with its pharmacy admin has been created successfully',
-    });
+    // Send a positive response
+    res.status(200).json(systemAdmins);
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
@@ -337,5 +318,6 @@ module.exports = {
   refreshToken,
   logout,
   deleteSystemAdmin,
-  createPharmacy,
+  updateSystemAdmin,
+  allSystemAdmins,
 };
