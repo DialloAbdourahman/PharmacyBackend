@@ -107,6 +107,3 @@ model Complain {
 }
 
 // npx prisma migrate dev --name init
-
-// Remove the create pharmacy route and put it on the pharmacy route instead of the systemadmin route.
-// Delete pharmacy route and on delete cascade.

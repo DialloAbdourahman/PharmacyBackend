@@ -1,3 +1,0 @@
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/pharmacyDB
-JWT_ACCESS_TOKEN_SECRET_SYSTEM_ADMIN=thisisthejwtsecretkeyforthesystemadmin
-JWT_REFRESH_TOKEN_SECRET_SYSTEM_ADMIN=thisisthejwtsecretrefreshkeyforthesystemadmin

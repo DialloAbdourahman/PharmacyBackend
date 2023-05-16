@@ -7,7 +7,8 @@ const prisma: PrismaClient<
   Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
 > = require('../utils/prismaClient');
 
-// to reuse this, change the process.env for the secrete key, change the decoded.data.titleName and that is all.
+// To reuse this, change the process.env for the secrete key, change the decoded.data.titleName and that is all.
+
 const authSystemAdmin = async (
   req: Request,
   res: Response,
@@ -45,4 +46,41 @@ const authSystemAdmin = async (
   }
 };
 
-module.exports = { authSystemAdmin };
+const authPharmacyAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    // Get the token and decode it.
+    const accessToken: any = req
+      .header('Authorization')
+      ?.replace('Bearer ', '');
+    const decoded = jwt.verify(
+      accessToken,
+      process.env.JWT_ACCESS_TOKEN_SECRET_PHARMACY_ADMIN
+    );
+
+    // Decode the accessToken
+    if (decoded.data.titleName !== 'pharmacy_admin') {
+      throw new Error();
+    }
+
+    // Attack the user's data to the request object.
+    req.user = { ...decoded.data };
+
+    // Run the next funtions so that the next function can be executed.
+    next();
+  } catch (error: any) {
+    if (
+      error?.name === 'TokenExpiredError' &&
+      error?.message === 'jwt expired'
+    ) {
+      res.status(401).json({ message: 'Token has expired.', error });
+      return;
+    }
+    res.status(401).json({ message: 'Please authenticate.', error });
+  }
+};
+
+module.exports = { authSystemAdmin, authPharmacyAdmin };

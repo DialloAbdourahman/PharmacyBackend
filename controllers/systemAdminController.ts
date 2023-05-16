@@ -182,7 +182,7 @@ const refreshToken = async (req: Request, res: Response) => {
 
     // Check if user was found
     if (!systemAdmin) {
-      res.status(401).json({ message: 'Please authenticate yooooo.' });
+      res.status(401).json({ message: 'Please authenticate.' });
       return;
     }
 
