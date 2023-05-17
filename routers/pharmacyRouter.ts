@@ -2,13 +2,11 @@ import express from 'express';
 const router = express.Router();
 
 // Importing controllers
-const { createPharmacy } = require('../controllers/pharmacyController');
 
 // Addiional imports
-const { authSystemAdmin } = require('../middlewares/auth');
+const {} = require('../middlewares/auth');
 
 // CREATE ROUTES
-router.post('/', authSystemAdmin, createPharmacy);
 
 // READ ROUTES
 

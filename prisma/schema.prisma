@@ -48,6 +48,9 @@ model PharmacyManager {
 
   pharmacyAdminCreator PharmacyAdmin @relation(fields: [creator], references: [id])
   creator              String
+
+  pharmacy           Pharmacy @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
+  associatedPharmacy String   @unique
 }
 
 model Cachier {
@@ -60,6 +63,8 @@ model Cachier {
   refreshToken         String?
   pharmacyAdminCreator PharmacyAdmin @relation(fields: [creator], references: [id], onDelete: Cascade)
   creator              String
+  pharmacy             Pharmacy      @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
+  associatedPharmacy   String        @unique
 }
 
 model Customer {
@@ -83,16 +88,21 @@ model UserType {
 }
 
 model Pharmacy {
-  id                 String         @id @default(uuid())
-  name               String         @unique
-  email              String         @unique
-  phoneNumber        String         @unique
-  address            String
-  hourly             String
-  allNight           Boolean
-  pharmacyAdmin      PharmacyAdmin?
-  systemAdminCreator SystemAdmin    @relation(fields: [creator], references: [id])
+  id          String  @id @default(uuid())
+  name        String  @unique
+  email       String  @unique
+  phoneNumber String  @unique
+  address     String
+  hourly      String
+  allNight    Boolean
+
+  pharmacyAdmin PharmacyAdmin?
+
+  systemAdminCreator SystemAdmin @relation(fields: [creator], references: [id])
   creator            String
+
+  phamarmacyManagers PharmacyManager[]
+  cachiers           Cachier[]
 }
 
 model PharmaceuticalProduct {
@@ -107,3 +117,6 @@ model Complain {
 }
 
 // npx prisma migrate dev --name init
+
+// delete the pharmacy and along side all the information releted to that pharmacy (also test and make sure that it is the same for the system admin)
+// See if it is pertinent to have pharmcacy admin creator on the pharmacy manager and cachier tables.
