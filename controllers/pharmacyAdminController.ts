@@ -113,6 +113,7 @@ const refreshToken = async (req: Request, res: Response) => {
         name: true,
         email: true,
         titleName: true,
+        associatedPharmacy: true,
       },
     });
 
@@ -205,9 +206,9 @@ const updateInformation = async (req: Request, res: Response) => {
   }
 };
 
-const createPharmacyManager = async (req: Request, res: Response) => {
+const createPharmacyAdmin = async (req: Request, res: Response) => {
   try {
-    // Get all the pharmacy manager's information
+    // Get all the pharmacy admin's information
     let { name, email, password } = req.body;
 
     // Check if all fields are present
@@ -222,21 +223,23 @@ const createPharmacyManager = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Invalid Email' });
     }
 
-    // Check if pharmacy manager email exists already
-    const pharmacyManagerExists = await prisma.pharmacyManager.findUnique({
+    // Check if pharmacy admin email exists already
+    const pharmacyAdmin = await prisma.pharmacyAdmin.findUnique({
       where: {
         email,
       },
     });
-    if (pharmacyManagerExists) {
+    if (pharmacyAdmin) {
       return res.status(400).json({ message: 'Email already used' });
     }
+
+    // Check how many pharmacy admins exists already.
 
     // Hash the password
     password = await bcrypt.hash(password, 8);
 
-    // Create a pharmacy manager
-    await prisma.pharmacyManager.create({
+    // Create a pharmacy admin
+    await prisma.pharmacyAdmin.create({
       data: {
         name,
         email,
@@ -249,19 +252,29 @@ const createPharmacyManager = async (req: Request, res: Response) => {
     // Send back response
     return res
       .status(201)
-      .json({ message: 'Pharmacy manager has been created successfully' });
+      .json({ message: 'Pharmacy admin has been created successfully' });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
 };
 
-const deletePharmacyManager = async (req: Request, res: Response) => {
+const deletePharmacyAdmin = async (req: Request, res: Response) => {
   try {
     // Get the id of the pharmacy manager
     const { id } = req.params;
 
-    // Delete the pharmacy manager
-    await prisma.pharmacyManager.delete({
+    // Prevent the deletion of the main pharmacy admin.
+    const pharmacyAdminToBeDeleted = await prisma.pharmacyAdmin.findUnique({
+      where: { id },
+    });
+    if (pharmacyAdminToBeDeleted?.creator === null) {
+      return res.status(400).json({
+        message: 'Sorry, you cannot delete the main pharmacy manager.',
+      });
+    }
+
+    // Delete the pharmacy admin
+    await prisma.pharmacyAdmin.delete({
       where: {
         id,
       },
@@ -270,7 +283,7 @@ const deletePharmacyManager = async (req: Request, res: Response) => {
     // Send back a positive response
     return res
       .status(200)
-      .json({ message: 'Pharmacy manager deleted successfully.' });
+      .json({ message: 'Pharmacy admin deleted successfully.' });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
@@ -397,6 +410,13 @@ const updatePharmacy = async (req: Request, res: Response) => {
 
 const deletePharmacy = async (req: Request, res: Response) => {
   try {
+    // Check to see if it is the main pharmacy admin that want's to delete the pharmacy
+    if (req.user.creator !== null) {
+      return res.status(400).json({
+        message: 'Sorry, only the main pharmacy admin can delete the pharmacy.',
+      });
+    }
+
     // Delete the pharmacy along side all the information related to that pharmacy.
     await prisma.pharmacy.delete({
       where: {
@@ -416,8 +436,8 @@ module.exports = {
   refreshToken,
   logout,
   updateInformation,
-  createPharmacyManager,
-  deletePharmacyManager,
+  createPharmacyAdmin,
+  deletePharmacyAdmin,
   createCachier,
   deleteCachier,
   updatePharmacy,

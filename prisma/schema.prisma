@@ -31,26 +31,13 @@ model PharmacyAdmin {
   refreshToken String?
 
   pharmacy           Pharmacy @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
-  associatedPharmacy String   @unique
+  associatedPharmacy String
 
-  pharmacyManagersCreated PharmacyManager[]
-  cachiersCreated         Cachier[]
-}
+  pharmacyAdminCreator  PharmacyAdmin?  @relation(fields: [creator], references: [id], name: "pharmacyAdminsCreated")
+  creator               String?
+  pharmacyAdminsCreated PharmacyAdmin[] @relation("pharmacyAdminsCreated")
 
-model PharmacyManager {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  password     String
-  title        UserType @relation(fields: [titleName], references: [name])
-  titleName    String   @default("pharmacy_manager")
-  refreshToken String?
-
-  pharmacyAdminCreator PharmacyAdmin @relation(fields: [creator], references: [id])
-  creator              String
-
-  pharmacy           Pharmacy @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
-  associatedPharmacy String   @unique
+  cachiersCreated Cachier[]
 }
 
 model Cachier {
@@ -78,13 +65,12 @@ model Customer {
 }
 
 model UserType {
-  name             String            @id
-  description      String?
-  SystemAdmins     SystemAdmin[]
-  pharmacyAdmins   PharmacyAdmin[]
-  pharmacyManagers PharmacyManager[]
-  cachiers         Cachier[]
-  customers        Customer[]
+  name           String          @id
+  description    String?
+  SystemAdmins   SystemAdmin[]
+  pharmacyAdmins PharmacyAdmin[]
+  cachiers       Cachier[]
+  customers      Customer[]
 }
 
 model Pharmacy {
@@ -96,13 +82,12 @@ model Pharmacy {
   hourly      String
   allNight    Boolean
 
-  pharmacyAdmin PharmacyAdmin?
+  pharmacyAdmin PharmacyAdmin[]
 
   systemAdminCreator SystemAdmin @relation(fields: [creator], references: [id])
   creator            String
 
-  phamarmacyManagers PharmacyManager[]
-  cachiers           Cachier[]
+  cachiers Cachier[]
 }
 
 model PharmaceuticalProduct {

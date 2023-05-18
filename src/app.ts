@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: false }));
 const systemAdminRouter = require('../routers/systemAdminRouter');
 const pharmacyAdminRouter = require('../routers/pharmacyAdminRouter');
 const pharmacyRouter = require('../routers/pharmacyRouter');
-const pharmacyManagerRouter = require('../routers/pharmacyManagerRouter');
+const cachierRouter = require('../routers/cachierRouter');
 
 // Adding user and token on the request object.
 declare global {
@@ -27,7 +27,7 @@ declare global {
 app.use('/api/systemAdmin', systemAdminRouter);
 app.use('/api/pharmacyAdmin', pharmacyAdminRouter);
 app.use('/api/pharmacy', pharmacyRouter);
-app.use('/api/pharmacyManager', pharmacyManagerRouter);
+app.use('/api/cachier', cachierRouter);
 
 // Exporting the app module
 module.exports = app;

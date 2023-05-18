@@ -83,4 +83,37 @@ const authPharmacyAdmin = async (
   }
 };
 
-module.exports = { authSystemAdmin, authPharmacyAdmin };
+const authCachier = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // Get the token and decode it.
+    const accessToken: any = req
+      .header('Authorization')
+      ?.replace('Bearer ', '');
+    const decoded = jwt.verify(
+      accessToken,
+      process.env.JWT_ACCESS_TOKEN_SECRET_CACHIER
+    );
+
+    // Decode the accessToken
+    if (decoded.data.titleName !== 'cachier') {
+      throw new Error();
+    }
+
+    // Attack the user's data to the request object.
+    req.user = { ...decoded.data };
+
+    // Run the next funtions so that the next function can be executed.
+    next();
+  } catch (error: any) {
+    if (
+      error?.name === 'TokenExpiredError' &&
+      error?.message === 'jwt expired'
+    ) {
+      res.status(401).json({ message: 'Token has expired.', error });
+      return;
+    }
+    res.status(401).json({ message: 'Please authenticate.', error });
+  }
+};
+
+module.exports = { authSystemAdmin, authPharmacyAdmin, authCachier };

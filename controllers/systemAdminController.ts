@@ -40,6 +40,8 @@ const createSystemAdmin = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Email already used' });
     }
 
+    // Check the number of system admins available already.
+
     // Hash the password
     password = await bcrypt.hash(password, 8);
 

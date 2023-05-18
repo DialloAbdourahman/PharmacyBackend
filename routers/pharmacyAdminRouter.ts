@@ -7,8 +7,8 @@ const {
   refreshToken,
   logout,
   updateInformation,
-  createPharmacyManager,
-  deletePharmacyManager,
+  createPharmacyAdmin,
+  deletePharmacyAdmin,
   createCachier,
   deleteCachier,
   updatePharmacy,
@@ -22,7 +22,7 @@ const { authPharmacyAdmin: auth } = require('../middlewares/auth');
 router.post('/login', loginPharmacyAdmin);
 router.post('/token', refreshToken);
 router.post('/logout', auth, logout);
-router.post('/createPharmacyManager', auth, createPharmacyManager);
+router.post('/createPharmacyAdmin', auth, createPharmacyAdmin);
 router.post('/createCachier', auth, createCachier);
 
 // READ ROUTES
@@ -32,7 +32,7 @@ router.put('/updatePharmacy', auth, updatePharmacy);
 router.put('/', auth, updateInformation);
 
 // DELETE ROUTES
-router.delete('/deletePharmacyManager/:id', auth, deletePharmacyManager);
+router.delete('/deletePharmacyAdmin/:id', auth, deletePharmacyAdmin);
 router.delete('/deleteCachier/:id', auth, deleteCachier);
 router.delete('/deletePharmacy', auth, deletePharmacy);
 
