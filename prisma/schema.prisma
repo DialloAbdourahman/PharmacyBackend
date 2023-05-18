@@ -118,5 +118,4 @@ model Complain {
 
 // npx prisma migrate dev --name init
 
-// delete the pharmacy and along side all the information releted to that pharmacy (also test and make sure that it is the same for the system admin)
 // See if it is pertinent to have pharmcacy admin creator on the pharmacy manager and cachier tables.
