@@ -8,46 +8,48 @@ datasource db {
 }
 
 model SystemAdmin {
-  id                  String        @id @default(uuid())
-  name                String
-  email               String        @unique
-  password            String
-  title               UserType      @relation(fields: [titleName], references: [name])
-  titleName           String        @default("system_admin")
-  refreshToken        String?
-  systemAdminCreator  SystemAdmin?  @relation(fields: [creator], references: [id], name: "system admins created")
-  creator             String?
+  id           String  @id @default(uuid())
+  name         String
+  email        String  @unique
+  password     String
+  refreshToken String?
+
+  title              UserType     @relation(fields: [titleName], references: [name])
+  titleName          String       @default("system_admin")
+  systemAdminCreator SystemAdmin? @relation(fields: [creator], references: [id], name: "system admins created")
+  creator            String?
+
   systemAdminsCreated SystemAdmin[] @relation("system admins created")
   pharmaciesCreated   Pharmacy[]
 }
 
 model PharmacyAdmin {
-  id           String   @id @default(uuid())
+  id           String  @id @default(uuid())
   name         String
-  email        String   @unique
+  email        String  @unique
   password     String
-  title        UserType @relation(fields: [titleName], references: [name])
-  titleName    String   @default("pharmacy_admin")
   refreshToken String?
 
-  pharmacy           Pharmacy @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
-  associatedPharmacy String
+  title                UserType       @relation(fields: [titleName], references: [name])
+  titleName            String         @default("pharmacy_admin")
+  pharmacy             Pharmacy       @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
+  associatedPharmacy   String
+  pharmacyAdminCreator PharmacyAdmin? @relation(fields: [creator], references: [id], name: "pharmacyAdminsCreated")
+  creator              String?
 
-  pharmacyAdminCreator  PharmacyAdmin?  @relation(fields: [creator], references: [id], name: "pharmacyAdminsCreated")
-  creator               String?
   pharmacyAdminsCreated PharmacyAdmin[] @relation("pharmacyAdminsCreated")
-
-  cachiersCreated Cachier[]
+  cachiersCreated       Cachier[]
 }
 
 model Cachier {
-  id                   String        @id @default(uuid())
-  name                 String
-  email                String        @unique
-  password             String
+  id           String  @id @default(uuid())
+  name         String
+  email        String  @unique
+  password     String
+  refreshToken String?
+
   title                UserType      @relation(fields: [titleName], references: [name])
   titleName            String        @default("cachier")
-  refreshToken         String?
   pharmacyAdminCreator PharmacyAdmin @relation(fields: [creator], references: [id], onDelete: Cascade)
   creator              String
   pharmacy             Pharmacy      @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
@@ -55,18 +57,20 @@ model Cachier {
 }
 
 model Customer {
-  id           String   @id @default(uuid())
+  id           String  @id @default(uuid())
   name         String
-  email        String   @unique
+  email        String  @unique
   password     String
-  title        UserType @relation(fields: [titleName], references: [name])
-  titleName    String   @default("customer")
   refreshToken String?
+
+  title     UserType @relation(fields: [titleName], references: [name])
+  titleName String   @default("customer")
 }
 
 model UserType {
-  name           String          @id
-  description    String?
+  name        String  @id
+  description String?
+
   SystemAdmins   SystemAdmin[]
   pharmacyAdmins PharmacyAdmin[]
   cachiers       Cachier[]
@@ -82,17 +86,31 @@ model Pharmacy {
   hourly      String
   allNight    Boolean
 
-  pharmacyAdmin PharmacyAdmin[]
-
   systemAdminCreator SystemAdmin @relation(fields: [creator], references: [id])
   creator            String
 
-  cachiers Cachier[]
+  pharmacyAdmin PharmacyAdmin[]
+  cachiers      Cachier[]
+  products      Product[]
 }
 
-model PharmaceuticalProduct {
+model ProductList {
   id   String @id @default(uuid())
   name String
+
+  products Product[]
+}
+
+model Product {
+  id       String  @id @default(uuid())
+  price    Float
+  amount   Int     @default(0)
+  reserved Boolean @default(false)
+
+  productList     ProductList @relation(fields: [product], references: [id], onDelete: Cascade)
+  product         String
+  pharmacy        Pharmacy    @relation(fields: [pharmacySelling], references: [id], onDelete: Cascade)
+  pharmacySelling String
 }
 
 model Complain {
@@ -101,6 +119,4 @@ model Complain {
   message String
 }
 
-// npx prisma migrate dev --name init
-
-// See if it is pertinent to have pharmcacy admin creator on the pharmacy manager and cachier tables.
+// npx prisma migrate dev --name init !!! need to run this after all the modifications you did

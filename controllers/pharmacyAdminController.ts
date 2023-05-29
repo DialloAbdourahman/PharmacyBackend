@@ -258,37 +258,6 @@ const createPharmacyAdmin = async (req: Request, res: Response) => {
   }
 };
 
-const deletePharmacyAdmin = async (req: Request, res: Response) => {
-  try {
-    // Get the id of the pharmacy manager
-    const { id } = req.params;
-
-    // Prevent the deletion of the main pharmacy admin.
-    const pharmacyAdminToBeDeleted = await prisma.pharmacyAdmin.findUnique({
-      where: { id },
-    });
-    if (pharmacyAdminToBeDeleted?.creator === null) {
-      return res.status(400).json({
-        message: 'Sorry, you cannot delete the main pharmacy manager.',
-      });
-    }
-
-    // Delete the pharmacy admin
-    await prisma.pharmacyAdmin.delete({
-      where: {
-        id,
-      },
-    });
-
-    // Send back a positive response
-    return res
-      .status(200)
-      .json({ message: 'Pharmacy admin deleted successfully.' });
-  } catch (error) {
-    return res.status(500).json({ message: 'Something went wrong.', error });
-  }
-};
-
 const createCachier = async (req: Request, res: Response) => {
   try {
     // Get all the cachier's information
@@ -358,74 +327,29 @@ const deleteCachier = async (req: Request, res: Response) => {
   }
 };
 
-const updatePharmacy = async (req: Request, res: Response) => {
+const seeAllPharmacyAdmins = async (req: Request, res: Response) => {
   try {
-    // Get the enteries and create a valid enteries array
-    const enteries = Object.keys(req.body);
-
-    if (enteries.length < 1) {
-      return res.status(400).json({ message: 'Please provide data to us.' });
-    }
-
-    const allowedEntery = [
-      'name',
-      'email',
-      'phoneNumber',
-      'address',
-      'hourly',
-      'allNight',
-    ];
-
-    // Check if the enteries are valid
-    const isValidOperation = enteries.every((entery) => {
-      return allowedEntery.includes(entery);
-    });
-
-    // Send negative response if the enteries are not allowed.
-    if (!isValidOperation) {
-      res.status(400).send({
-        message: 'You are trying to update data you are not allowed to',
-      });
-      return;
-    }
-
-    // Update the pharmacy's information.
-    await prisma.pharmacy.update({
-      where: {
-        id: req.user.associatedPharmacy,
-      },
-      data: {
-        ...req.body,
+    // Get all the pharmacy admins
+    const pharmacyAdmins = await prisma.pharmacyAdmin.findMany({
+      select: {
+        name: true,
+        email: true,
+        titleName: true,
+        pharmacy: {
+          select: {
+            name: true,
+          },
+        },
+        pharmacyAdminCreator: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
-    // Send back a positive response
-    res.status(201).json({
-      message: "Phamacy's credentials have been updated successfully.",
-    });
-  } catch (error) {
-    return res.status(500).json({ message: 'Something went wrong.', error });
-  }
-};
-
-const deletePharmacy = async (req: Request, res: Response) => {
-  try {
-    // Check to see if it is the main pharmacy admin that want's to delete the pharmacy
-    if (req.user.creator !== null) {
-      return res.status(400).json({
-        message: 'Sorry, only the main pharmacy admin can delete the pharmacy.',
-      });
-    }
-
-    // Delete the pharmacy along side all the information related to that pharmacy.
-    await prisma.pharmacy.delete({
-      where: {
-        id: req.user.associatedPharmacy,
-      },
-    });
-
-    // Send back a positive response
-    res.status(200).json({ message: 'Pharmacy has been deleted.' });
+    // Send a positive response
+    res.status(200).json(pharmacyAdmins);
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
@@ -437,9 +361,7 @@ module.exports = {
   logout,
   updateInformation,
   createPharmacyAdmin,
-  deletePharmacyAdmin,
   createCachier,
   deleteCachier,
-  updatePharmacy,
-  deletePharmacy,
+  seeAllPharmacyAdmins,
 };

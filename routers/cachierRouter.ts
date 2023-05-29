@@ -6,6 +6,8 @@ const {
   loginCachier,
   refreshToken,
   logout,
+  updateCredentiatls,
+  deleteAccount,
 } = require('../controllers/cachierController');
 
 // Addiional imports
@@ -19,7 +21,9 @@ router.post('/logout', auth, logout);
 // READ ROUTES
 
 // UPDATE ROUTES
+router.put('/', auth, updateCredentiatls);
 
 // DELETE ROUTES
+router.delete('/', auth, deleteAccount);
 
 module.exports = router;

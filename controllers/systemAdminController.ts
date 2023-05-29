@@ -15,6 +15,14 @@ const {
 
 const createSystemAdmin = async (req: Request, res: Response) => {
   try {
+    // Limit the amount of system admins created.
+    const systemAdmins = await prisma.systemAdmin.count();
+    if (systemAdmins >= 5) {
+      return res
+        .status(400)
+        .json({ message: 'Maximum amount of system admins has been created.' });
+    }
+
     // Get all the system admin's information
     let { name, email, password } = req.body;
 
@@ -92,6 +100,7 @@ const loginSystemAdmin = async (req: Request, res: Response) => {
         email: true,
         titleName: true,
         password: true,
+        creator: true,
       },
     });
     if (!systemAdmin) {
@@ -200,38 +209,6 @@ const refreshToken = async (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(401).json({ message: 'Please authenticate.', error });
-  }
-};
-
-const deleteSystemAdmin = async (req: Request, res: Response) => {
-  try {
-    // Get the id of the system admin to be deleted from the request params
-    const { id } = req.params;
-
-    // Check if you wanna delete the main system admin
-    const systemAdminToBeDeleted = await prisma.systemAdmin.findUnique({
-      where: { id },
-    });
-
-    if (systemAdminToBeDeleted?.creator === null) {
-      return res
-        .status(400)
-        .json({ message: 'Sorry you cannot delete the main system admin.' });
-    }
-
-    // Delete the system admin
-    await prisma.systemAdmin.delete({
-      where: {
-        id,
-      },
-    });
-
-    // Send a positive response back
-    return res
-      .status(200)
-      .json({ message: 'System admin has been deleted successfully.' });
-  } catch (error) {
-    return res.status(500).json({ message: 'Something went wrong.', error });
   }
 };
 
@@ -448,7 +425,6 @@ module.exports = {
   loginSystemAdmin,
   refreshToken,
   logout,
-  deleteSystemAdmin,
   updateSystemAdmin,
   allSystemAdmins,
   createPharmacy,

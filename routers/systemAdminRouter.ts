@@ -7,7 +7,6 @@ const {
   loginSystemAdmin,
   refreshToken,
   logout,
-  deleteSystemAdmin,
   updateSystemAdmin,
   allSystemAdmins,
   createPharmacy,
@@ -32,6 +31,5 @@ router.put('/', auth, updateSystemAdmin);
 
 // DELETE ROUTES
 router.delete('/deletePharmacy/:id', auth, deletePharmacy);
-router.delete('/:id', auth, deleteSystemAdmin);
 
 module.exports = router;

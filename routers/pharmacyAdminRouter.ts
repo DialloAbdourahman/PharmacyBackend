@@ -8,11 +8,9 @@ const {
   logout,
   updateInformation,
   createPharmacyAdmin,
-  deletePharmacyAdmin,
   createCachier,
   deleteCachier,
-  updatePharmacy,
-  deletePharmacy,
+  seeAllPharmacyAdmins,
 } = require('../controllers/pharmacyAdminController');
 
 // Addiional imports
@@ -26,14 +24,12 @@ router.post('/createPharmacyAdmin', auth, createPharmacyAdmin);
 router.post('/createCachier', auth, createCachier);
 
 // READ ROUTES
+router.get('/', auth, seeAllPharmacyAdmins);
 
 // UPDATE ROUTES
-router.put('/updatePharmacy', auth, updatePharmacy);
 router.put('/', auth, updateInformation);
 
 // DELETE ROUTES
-router.delete('/deletePharmacyAdmin/:id', auth, deletePharmacyAdmin);
 router.delete('/deleteCachier/:id', auth, deleteCachier);
-router.delete('/deletePharmacy', auth, deletePharmacy);
 
 module.exports = router;

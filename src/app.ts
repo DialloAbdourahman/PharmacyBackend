@@ -4,15 +4,21 @@ const cors = require('cors');
 const app = express();
 
 // Express configurations.
-app.use(cors());
+app.use(
+  cors({
+    origin: ['http://localhost:3000'],
+    method: ['POST', 'GET', 'PUT', 'DELETE'],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // All the routers import
 const systemAdminRouter = require('../routers/systemAdminRouter');
 const pharmacyAdminRouter = require('../routers/pharmacyAdminRouter');
-const pharmacyRouter = require('../routers/pharmacyRouter');
 const cachierRouter = require('../routers/cachierRouter');
+const customerRouter = require('../routers/customerRouter');
 
 // Adding user and token on the request object.
 declare global {
@@ -26,8 +32,8 @@ declare global {
 // Routes to routers mapping.
 app.use('/api/systemAdmin', systemAdminRouter);
 app.use('/api/pharmacyAdmin', pharmacyAdminRouter);
-app.use('/api/pharmacy', pharmacyRouter);
 app.use('/api/cachier', cachierRouter);
+app.use('/api/customer', customerRouter);
 
 // Exporting the app module
 module.exports = app;
