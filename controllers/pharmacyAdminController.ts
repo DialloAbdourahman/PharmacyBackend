@@ -126,7 +126,7 @@ const refreshToken = async (req: Request, res: Response) => {
     // Generate a new access token
     const accessToken = await generateAccessToken(
       pharmacyAdmin,
-      process.env.JWT_ACCESS_TOKEN_SECRET_SYSTEM_ADMIN
+      process.env.JWT_ACCESS_TOKEN_SECRET_PHARMACY_ADMIN
     );
 
     // Send the access token to the system admin
@@ -208,6 +208,14 @@ const updateInformation = async (req: Request, res: Response) => {
 
 const createPharmacyAdmin = async (req: Request, res: Response) => {
   try {
+    // Limit the amount of pharmacy admins created.
+    const pharmacyAdmins = await prisma.pharmacyAdmin.count();
+    if (pharmacyAdmins >= 5) {
+      return res.status(400).json({
+        message: 'Maximum amount of pharmacy admins has been created.',
+      });
+    }
+
     // Get all the pharmacy admin's information
     let { name, email, password } = req.body;
 
@@ -260,6 +268,14 @@ const createPharmacyAdmin = async (req: Request, res: Response) => {
 
 const createCachier = async (req: Request, res: Response) => {
   try {
+    // Limit the amount of cachiers created.
+    const cachiers = await prisma.cachier.count();
+    if (cachiers >= 5) {
+      return res.status(400).json({
+        message: 'Maximum amount of cachiers has been created.',
+      });
+    }
+
     // Get all the cachier's information
     let { name, email, password } = req.body;
 
@@ -355,6 +371,72 @@ const seeAllPharmacyAdmins = async (req: Request, res: Response) => {
   }
 };
 
+const seeAllCachiers = async (req: Request, res: Response) => {
+  try {
+    // Get all the cachiers.
+    const cachiers = await prisma.cachier.findMany({});
+
+    // Send a positive response
+    res.status(200).json(cachiers);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const seeCachier = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the cachier from the request params
+    const { id } = req.params;
+
+    // Get the cachier
+    const cachier = await prisma.cachier.findUnique({ where: { id } });
+
+    // Send a positive response
+    res.status(200).json(cachier);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const createProduct = async (req: Request, res: Response) => {
+  try {
+    // Get all required data
+    const { productId, price, amount } = req.body;
+
+    // Check if product exists already
+    const productExists = await prisma.product.findFirst({
+      where: {
+        product: productId,
+        pharmacySelling: req.user.associatedPharmacy,
+      },
+    });
+    if (productExists) {
+      return res.status(400).json({ message: 'Product exists already.' });
+    }
+
+    // Check if all the required data is entered.
+    if (!productId || !price || !amount) {
+      return res
+        .status(400)
+        .json({ message: 'Please enter all the required data.' });
+    }
+
+    // Create the product
+    await prisma.product.create({
+      data: {
+        product: productId,
+        price,
+        amount,
+        pharmacySelling: req.user.associatedPharmacy,
+      },
+    });
+
+    return res.status(200).json({ message: 'Product created successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
 module.exports = {
   loginPharmacyAdmin,
   refreshToken,
@@ -364,4 +446,7 @@ module.exports = {
   createCachier,
   deleteCachier,
   seeAllPharmacyAdmins,
+  seeAllCachiers,
+  seeCachier,
+  createProduct,
 };

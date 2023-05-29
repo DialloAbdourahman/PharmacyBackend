@@ -420,6 +420,168 @@ const deletePharmacy = async (req: Request, res: Response) => {
   }
 };
 
+const updatePharmacy = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the pharmacy to be updated.
+    const { id } = req.params;
+
+    // Get the enteries and create a valid enteries array
+    const enteries = Object.keys(req.body);
+
+    if (enteries.length < 1) {
+      return res.status(400).json({ message: 'Please provide data to us.' });
+    }
+
+    const allowedEntery = [
+      'name',
+      'email',
+      'phoneNumber',
+      'address',
+      'hourly',
+      'allNight',
+    ];
+
+    // Check if the enteries are valid
+    const isValidOperation = enteries.every((entery) => {
+      return allowedEntery.includes(entery);
+    });
+
+    // Send negative response if the enteries are not allowed.
+    if (!isValidOperation) {
+      res.status(400).send({
+        message: 'You are trying to update data you are not allowed to',
+      });
+      return;
+    }
+
+    // Update the pharmacy's information.
+    const pharmacy = await prisma.pharmacy.update({
+      where: {
+        id,
+      },
+      data: {
+        ...req.body,
+      },
+    });
+
+    // Send back a positive response
+    res.status(201).json({
+      message: "Phamacy's credentials have been updated successfully.",
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const createProduct = async (req: Request, res: Response) => {
+  try {
+    // Get all the required data from the request body
+    const { name, description, normalPrice } = req.body;
+
+    // Check of the field have been entered
+    if (!name || !description || !normalPrice) {
+      return res.status(400).json({ message: 'Please enter all the fields.' });
+    }
+
+    // Check if there is a product with the same name
+    const productExists = await prisma.productList.findUnique({
+      where: {
+        name,
+      },
+    });
+    if (productExists) {
+      return res.status(400).json({ message: 'Product exists already.' });
+    }
+
+    // Creating the product
+    const product = await prisma.productList.create({
+      data: {
+        name,
+        description,
+        normalPrice,
+      },
+    });
+
+    // Send back a positive response with the product
+    res.status(201).json(product);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const seeProducts = async (req: Request, res: Response) => {
+  try {
+    // Get all the products from the database
+    const products = await prisma.productList.findMany({});
+
+    // Send back a positive response
+    res.status(200).json(products);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const seeProduct = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the product
+    const { id } = req.params;
+
+    // Get the product from database
+    const product = await prisma.productList.findUnique({ where: { id } });
+
+    // Send back a positive response.
+    res.status(200).json(product);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const updateProduct = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the product to be deleted.
+    const { id } = req.params;
+
+    // Get the enteries and create a valid enteries array
+    const enteries = Object.keys(req.body);
+
+    if (enteries.length < 1) {
+      return res.status(400).json({ message: 'Please provide data to us.' });
+    }
+
+    const allowedEntery = ['name', 'description', 'normalPrice'];
+
+    // Check if the enteries are valid
+    const isValidOperation = enteries.every((entery) => {
+      return allowedEntery.includes(entery);
+    });
+
+    // Send negative response if the enteries are not allowed.
+    if (!isValidOperation) {
+      res.status(400).send({
+        message: 'You are trying to update data you are not allowed to',
+      });
+      return;
+    }
+
+    // Update the product's information.
+    await prisma.productList.update({
+      where: {
+        id,
+      },
+      data: {
+        ...req.body,
+      },
+    });
+
+    // Send back a positive response
+    res.status(201).json({
+      message: 'Product has been updated successfully.',
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
 module.exports = {
   createSystemAdmin,
   loginSystemAdmin,
@@ -429,4 +591,9 @@ module.exports = {
   allSystemAdmins,
   createPharmacy,
   deletePharmacy,
+  updatePharmacy,
+  createProduct,
+  seeProducts,
+  seeProduct,
+  updateProduct,
 };

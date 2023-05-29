@@ -95,8 +95,10 @@ model Pharmacy {
 }
 
 model ProductList {
-  id   String @id @default(uuid())
-  name String
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+  normalPrice Float
 
   products Product[]
 }
@@ -108,7 +110,7 @@ model Product {
   reserved Boolean @default(false)
 
   productList     ProductList @relation(fields: [product], references: [id], onDelete: Cascade)
-  product         String
+  product         String      @unique
   pharmacy        Pharmacy    @relation(fields: [pharmacySelling], references: [id], onDelete: Cascade)
   pharmacySelling String
 }
@@ -119,4 +121,11 @@ model Complain {
   message String
 }
 
-// npx prisma migrate dev --name init !!! need to run this after all the modifications you did
+// npx prisma migrate dev --name init 
+
+// Update a product
+// delete a product
+// see all products of this pharmacy.
+// see a product
+
+// Do all mr kimbi's hw from joel and maybe esau

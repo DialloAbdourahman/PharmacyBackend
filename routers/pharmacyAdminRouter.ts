@@ -11,6 +11,9 @@ const {
   createCachier,
   deleteCachier,
   seeAllPharmacyAdmins,
+  seeAllCachiers,
+  seeCachier,
+  createProduct,
 } = require('../controllers/pharmacyAdminController');
 
 // Addiional imports
@@ -22,8 +25,11 @@ router.post('/token', refreshToken);
 router.post('/logout', auth, logout);
 router.post('/createPharmacyAdmin', auth, createPharmacyAdmin);
 router.post('/createCachier', auth, createCachier);
+router.post('/createProduct', auth, createProduct);
 
 // READ ROUTES
+router.get('/seeAllCachiers', auth, seeAllCachiers);
+router.get('/seeCachier/:id', auth, seeCachier);
 router.get('/', auth, seeAllPharmacyAdmins);
 
 // UPDATE ROUTES
