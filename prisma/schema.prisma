@@ -123,9 +123,4 @@ model Complain {
 
 // npx prisma migrate dev --name init 
 
-// Update a product
-// delete a product
-// see all products of this pharmacy.
-// see a product
-
 // Do all mr kimbi's hw from joel and maybe esau

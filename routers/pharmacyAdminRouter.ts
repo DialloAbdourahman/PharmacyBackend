@@ -14,6 +14,10 @@ const {
   seeAllCachiers,
   seeCachier,
   createProduct,
+  updateProduct,
+  deleteProduct,
+  seeOurProducts,
+  seeOneOFOurProduct,
 } = require('../controllers/pharmacyAdminController');
 
 // Addiional imports
@@ -30,12 +34,16 @@ router.post('/createProduct', auth, createProduct);
 // READ ROUTES
 router.get('/seeAllCachiers', auth, seeAllCachiers);
 router.get('/seeCachier/:id', auth, seeCachier);
+router.get('/seeOurProducts', auth, seeOurProducts);
+router.get('/seeOneOFOurProduct/:id', auth, seeOneOFOurProduct);
 router.get('/', auth, seeAllPharmacyAdmins);
 
 // UPDATE ROUTES
+router.put('/updateProduct/:id', auth, updateProduct);
 router.put('/', auth, updateInformation);
 
 // DELETE ROUTES
 router.delete('/deleteCachier/:id', auth, deleteCachier);
+router.delete('/deleteProduct/:id', auth, deleteProduct);
 
 module.exports = router;
