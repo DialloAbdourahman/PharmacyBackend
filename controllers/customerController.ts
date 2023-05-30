@@ -212,10 +212,67 @@ const reserveProduct = async (req: Request, res: Response) => {
   }
 };
 
+const placeOrder = async (req: Request, res: Response) => {
+  try {
+    // Get the list of products from the request body. cart=[{productId:"1234", quantity:2}]
+    const { cart } = req.body;
+
+    // Check if the products array exist and if there is at least one product
+    if (!cart || cart?.length < 1) {
+      return res.status(400).json({
+        message:
+          'Please provide a cart to us and make sure that at least one product is inside it.',
+      });
+    }
+
+    // Do all the payment stuff here
+
+    // Store that data in db and create a reciept
+    const orderList = await Promise.all(
+      cart.map(async ({ productId, quantity }: any) => {
+        if (productId && quantity) {
+          const singleOrder = await prisma.order.create({
+            data: {
+              productId,
+              quantity,
+              customerId: req.user.id,
+            },
+            include: {
+              orderedProduct: {
+                select: {
+                  id: true,
+                  price: true,
+                  pharmacy: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
+              customerOrdering: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          });
+          return singleOrder;
+        }
+      })
+    );
+
+    // Send back a positive response.
+    res.status(201).json({ message: 'Order has been placed.', orderList });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
 module.exports = {
   createCustomer,
   loginCustomer,
   reserveProduct,
   logoutCustomer,
   refreshToken,
+  placeOrder,
 };

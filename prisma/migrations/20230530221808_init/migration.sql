@@ -4,8 +4,8 @@ CREATE TABLE "SystemAdmin" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "titleName" TEXT NOT NULL DEFAULT 'system_admin',
     "refreshToken" TEXT,
+    "titleName" TEXT NOT NULL DEFAULT 'system_admin',
     "creator" TEXT,
 
     CONSTRAINT "SystemAdmin_pkey" PRIMARY KEY ("id")
@@ -17,25 +17,12 @@ CREATE TABLE "PharmacyAdmin" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "titleName" TEXT NOT NULL DEFAULT 'pharmacy_admin',
     "refreshToken" TEXT,
+    "titleName" TEXT NOT NULL DEFAULT 'pharmacy_admin',
     "associatedPharmacy" TEXT NOT NULL,
+    "creator" TEXT,
 
     CONSTRAINT "PharmacyAdmin_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "PharmacyManager" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
-    "titleName" TEXT NOT NULL DEFAULT 'pharmacy_manager',
-    "refreshToken" TEXT,
-    "creator" TEXT NOT NULL,
-    "associatedPharmacy" TEXT NOT NULL,
-
-    CONSTRAINT "PharmacyManager_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -44,8 +31,8 @@ CREATE TABLE "Cachier" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "titleName" TEXT NOT NULL DEFAULT 'cachier',
     "refreshToken" TEXT,
+    "titleName" TEXT NOT NULL DEFAULT 'cachier',
     "creator" TEXT NOT NULL,
     "associatedPharmacy" TEXT NOT NULL,
 
@@ -58,8 +45,8 @@ CREATE TABLE "Customer" (
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "titleName" TEXT NOT NULL DEFAULT 'customer',
     "refreshToken" TEXT,
+    "titleName" TEXT NOT NULL DEFAULT 'customer',
 
     CONSTRAINT "Customer_pkey" PRIMARY KEY ("id")
 );
@@ -87,11 +74,37 @@ CREATE TABLE "Pharmacy" (
 );
 
 -- CreateTable
-CREATE TABLE "PharmaceuticalProduct" (
+CREATE TABLE "ProductList" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "normalPrice" DOUBLE PRECISION NOT NULL,
 
-    CONSTRAINT "PharmaceuticalProduct_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ProductList_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Product" (
+    "id" TEXT NOT NULL,
+    "price" DOUBLE PRECISION NOT NULL,
+    "amount" INTEGER NOT NULL DEFAULT 0,
+    "reserved" BOOLEAN NOT NULL DEFAULT false,
+    "product" TEXT NOT NULL,
+    "pharmacySelling" TEXT NOT NULL,
+
+    CONSTRAINT "Product_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Order" (
+    "id" TEXT NOT NULL,
+    "quantity" INTEGER[],
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "fulfilled" BOOLEAN NOT NULL DEFAULT false,
+    "product" TEXT NOT NULL,
+    "customer" TEXT NOT NULL,
+
+    CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -108,15 +121,6 @@ CREATE UNIQUE INDEX "SystemAdmin_email_key" ON "SystemAdmin"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "PharmacyAdmin_email_key" ON "PharmacyAdmin"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "PharmacyAdmin_associatedPharmacy_key" ON "PharmacyAdmin"("associatedPharmacy");
-
--- CreateIndex
-CREATE UNIQUE INDEX "PharmacyManager_email_key" ON "PharmacyManager"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "PharmacyManager_associatedPharmacy_key" ON "PharmacyManager"("associatedPharmacy");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Cachier_email_key" ON "Cachier"("email");
@@ -136,6 +140,12 @@ CREATE UNIQUE INDEX "Pharmacy_email_key" ON "Pharmacy"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "Pharmacy_phoneNumber_key" ON "Pharmacy"("phoneNumber");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "ProductList_name_key" ON "ProductList"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Product_product_key" ON "Product"("product");
+
 -- AddForeignKey
 ALTER TABLE "SystemAdmin" ADD CONSTRAINT "SystemAdmin_titleName_fkey" FOREIGN KEY ("titleName") REFERENCES "UserType"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -149,13 +159,7 @@ ALTER TABLE "PharmacyAdmin" ADD CONSTRAINT "PharmacyAdmin_titleName_fkey" FOREIG
 ALTER TABLE "PharmacyAdmin" ADD CONSTRAINT "PharmacyAdmin_associatedPharmacy_fkey" FOREIGN KEY ("associatedPharmacy") REFERENCES "Pharmacy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "PharmacyManager" ADD CONSTRAINT "PharmacyManager_titleName_fkey" FOREIGN KEY ("titleName") REFERENCES "UserType"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "PharmacyManager" ADD CONSTRAINT "PharmacyManager_creator_fkey" FOREIGN KEY ("creator") REFERENCES "PharmacyAdmin"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "PharmacyManager" ADD CONSTRAINT "PharmacyManager_associatedPharmacy_fkey" FOREIGN KEY ("associatedPharmacy") REFERENCES "Pharmacy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "PharmacyAdmin" ADD CONSTRAINT "PharmacyAdmin_creator_fkey" FOREIGN KEY ("creator") REFERENCES "PharmacyAdmin"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Cachier" ADD CONSTRAINT "Cachier_titleName_fkey" FOREIGN KEY ("titleName") REFERENCES "UserType"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -171,3 +175,15 @@ ALTER TABLE "Customer" ADD CONSTRAINT "Customer_titleName_fkey" FOREIGN KEY ("ti
 
 -- AddForeignKey
 ALTER TABLE "Pharmacy" ADD CONSTRAINT "Pharmacy_creator_fkey" FOREIGN KEY ("creator") REFERENCES "SystemAdmin"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_product_fkey" FOREIGN KEY ("product") REFERENCES "ProductList"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Product" ADD CONSTRAINT "Product_pharmacySelling_fkey" FOREIGN KEY ("pharmacySelling") REFERENCES "Pharmacy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_product_fkey" FOREIGN KEY ("product") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Order" ADD CONSTRAINT "Order_customer_fkey" FOREIGN KEY ("customer") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

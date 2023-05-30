@@ -65,6 +65,8 @@ model Customer {
 
   title     UserType @relation(fields: [titleName], references: [name])
   titleName String   @default("customer")
+
+  orders Order[]
 }
 
 model UserType {
@@ -113,6 +115,20 @@ model Product {
   product         String      @unique
   pharmacy        Pharmacy    @relation(fields: [pharmacySelling], references: [id], onDelete: Cascade)
   pharmacySelling String
+
+  orders Order[]
+}
+
+model Order {
+  id        String   @id @default(uuid())
+  quantity  Int
+  date      DateTime @default(now())
+  fulfilled Boolean  @default(false)
+
+  orderedProduct   Product  @relation(fields: [productId], references: [id])
+  productId        String
+  customerOrdering Customer @relation(fields: [customerId], references: [id])
+  customerId       String
 }
 
 model Complain {
@@ -122,5 +138,3 @@ model Complain {
 }
 
 // npx prisma migrate dev --name init 
-
-// Do all mr kimbi's hw from joel and maybe esau
