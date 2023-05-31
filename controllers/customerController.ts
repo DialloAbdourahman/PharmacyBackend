@@ -268,18 +268,6 @@ const placeOrder = async (req: Request, res: Response) => {
           return;
         }
 
-        // Update the product's quantity.
-        await prisma.product.update({
-          where: {
-            id: productId,
-          },
-          data: {
-            amount: {
-              decrement: quantity,
-            },
-          },
-        });
-
         totalAmount += product.price * quantity;
       })
     );
@@ -319,6 +307,18 @@ const placeOrder = async (req: Request, res: Response) => {
                 name: true,
                 email: true,
               },
+            },
+          },
+        });
+
+        // Update the product's quantity.
+        await prisma.product.update({
+          where: {
+            id: productId,
+          },
+          data: {
+            amount: {
+              decrement: quantity,
             },
           },
         });
