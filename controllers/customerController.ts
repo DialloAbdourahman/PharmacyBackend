@@ -215,7 +215,7 @@ const reserveProduct = async (req: Request, res: Response) => {
 const placeOrder = async (req: Request, res: Response) => {
   try {
     // Get the list of products from the request body. cart=[{productId:"1234", quantity:2}]
-    const { cart } = req.body;
+    let { cart } = req.body;
 
     // Check if the products array exist and if there is at least one product
     if (!cart || cart?.length < 1) {
@@ -225,52 +225,112 @@ const placeOrder = async (req: Request, res: Response) => {
       });
     }
 
+    // Check if each object contains a productId and quantity minimum.
+    const isValidData = cart.every(({ productId, quantity }: any) => {
+      return productId && quantity;
+    });
+    if (!isValidData) {
+      return res.status(400).json({
+        message:
+          'Please make sure that every product in the cart has at least a productId and a quantity.',
+      });
+    }
+
+    // Calculate the total amount.
+    let totalAmount = 0;
+    await Promise.all(
+      cart.map(async ({ productId, quantity }: any) => {
+        // Get the product
+        const product: any = await prisma.product.findUnique({
+          where: { id: productId },
+          select: {
+            amount: true,
+            price: true,
+            productList: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        });
+
+        // Check if the amount is enough
+        if (quantity > product?.amount) {
+          // Not enough of this product
+          // filter the array of card comming and remove this product
+          // Since it is your problem if you give us wrong data, just follow the frontend
+          // Now the order will use the cart info which is correct
+          // return at the end the total
+          cart = cart.filter((item: any) => {
+            return item.productId !== productId && item.quantity !== quantity;
+          });
+
+          return;
+        }
+
+        // Update the product's quantity.
+        await prisma.product.update({
+          where: {
+            id: productId,
+          },
+          data: {
+            amount: {
+              decrement: quantity,
+            },
+          },
+        });
+
+        totalAmount += product.price * quantity;
+      })
+    );
+
     // Do all the payment stuff here
 
-    // Store that data in db and create a reciept
+    // Store that data in db, create a reciept and udpate product's amount.
     let orderList = await Promise.all(
       cart.map(async ({ productId, quantity }: any) => {
-        if (productId && quantity) {
-          const singleOrder = await prisma.order.create({
-            data: {
-              productId,
-              quantity,
-              customerId: req.user.id,
-            },
-            select: {
-              id: true,
-              quantity: true,
-              date: true,
-              orderedProduct: {
-                select: {
-                  price: true,
-                  pharmacy: {
-                    select: {
-                      name: true,
-                    },
+        const singleOrder = await prisma.order.create({
+          data: {
+            productId,
+            quantity,
+            customerId: req.user.id,
+          },
+          select: {
+            id: true,
+            quantity: true,
+            date: true,
+            orderedProduct: {
+              select: {
+                price: true,
+                pharmacy: {
+                  select: {
+                    name: true,
                   },
-                  productList: {
-                    select: {
-                      name: true,
-                    },
+                },
+                productList: {
+                  select: {
+                    name: true,
                   },
                 },
               },
-              customerOrdering: {
-                select: {
-                  name: true,
-                  email: true,
-                },
+            },
+            customerOrdering: {
+              select: {
+                name: true,
+                email: true,
               },
             },
-          });
-          return singleOrder;
-        }
+          },
+        });
+
+        return singleOrder;
       })
     );
 
     // Send back a positive response.
-    res.status(201).json({ message: 'Order has been placed.', orderList });
+    res
+      .status(201)
+      .json({ message: 'Order has been placed.', orderList, totalAmount });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
