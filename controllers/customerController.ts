@@ -228,7 +228,7 @@ const placeOrder = async (req: Request, res: Response) => {
     // Do all the payment stuff here
 
     // Store that data in db and create a reciept
-    const orderList = await Promise.all(
+    let orderList = await Promise.all(
       cart.map(async ({ productId, quantity }: any) => {
         if (productId && quantity) {
           const singleOrder = await prisma.order.create({
@@ -237,12 +237,19 @@ const placeOrder = async (req: Request, res: Response) => {
               quantity,
               customerId: req.user.id,
             },
-            include: {
+            select: {
+              id: true,
+              quantity: true,
+              date: true,
               orderedProduct: {
                 select: {
-                  id: true,
                   price: true,
                   pharmacy: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                  productList: {
                     select: {
                       name: true,
                     },
@@ -252,6 +259,7 @@ const placeOrder = async (req: Request, res: Response) => {
               customerOrdering: {
                 select: {
                   name: true,
+                  email: true,
                 },
               },
             },
