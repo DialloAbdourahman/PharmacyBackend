@@ -246,11 +246,6 @@ const placeOrder = async (req: Request, res: Response) => {
           select: {
             amount: true,
             price: true,
-            productList: {
-              select: {
-                name: true,
-              },
-            },
           },
         });
 
@@ -336,6 +331,90 @@ const placeOrder = async (req: Request, res: Response) => {
   }
 };
 
+const updateAccount = async (req: Request, res: Response) => {
+  try {
+    // Get the enteries and create a valid enteries array
+    const enteries = Object.keys(req.body);
+
+    if (enteries.length < 1) {
+      return res.status(400).json({ message: 'Please provide data to us.' });
+    }
+
+    const allowedEntery = ['name', 'email', 'password'];
+
+    // Check if the enteries are valid
+    const isValidOperation = enteries.every((entery) => {
+      return allowedEntery.includes(entery);
+    });
+
+    // Send negative response if the enteries are not allowed.
+    if (!isValidOperation) {
+      res.status(400).send({
+        message: 'You are trying to update data you are not allowed to',
+      });
+      return;
+    }
+
+    // Check if the password should be updated and then encrypt it.
+    const passwordUpdate = enteries.find((entery) => entery === 'password');
+    if (passwordUpdate) {
+      req.body.password = await bcrypt.hash(req.body.password, 8);
+    }
+
+    // Update the customer's information.
+    await prisma.customer.update({
+      where: {
+        id: req.user.id,
+      },
+      data: {
+        ...req.body,
+      },
+    });
+
+    // Send back a positive response
+    res
+      .status(201)
+      .json({ message: 'Your credentials have been updated successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const seeOrders = async (req: Request, res: Response) => {
+  try {
+    // Get the orders from db.
+    const orders = await prisma.order.findMany({
+      where: {
+        customerId: req.user.id,
+      },
+      select: {
+        id: true,
+        quantity: true,
+        fulfilled: true,
+        date: true,
+        orderedProduct: {
+          select: {
+            price: true,
+            productList: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        date: 'desc',
+      },
+    });
+
+    // Send back a positive response to the customer
+    res.status(200).json(orders);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
 module.exports = {
   createCustomer,
   loginCustomer,
@@ -343,4 +422,6 @@ module.exports = {
   logoutCustomer,
   refreshToken,
   placeOrder,
+  updateAccount,
+  seeOrders,
 };

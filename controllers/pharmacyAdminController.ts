@@ -503,10 +503,40 @@ const deleteProduct = async (req: Request, res: Response) => {
 
 const seeOurProducts = async (req: Request, res: Response) => {
   try {
+    // Get the search criteria from request body.
+    let { name, page } = req.body;
+
+    // Configure the pages. Here, the first page will be 1.
+    const itemPerPage = 10;
+    page = page - 1;
+
     // Get the products from db.
     const products = await prisma.product.findMany({
+      take: itemPerPage,
+      skip: itemPerPage * page,
       where: {
         pharmacySelling: req.user.associatedPharmacy,
+        productList: {
+          name: {
+            contains: name,
+            mode: 'insensitive',
+          },
+        },
+      },
+      select: {
+        id: true,
+        price: true,
+        amount: true,
+        productList: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        productList: {
+          name: 'asc',
+        },
       },
     });
 

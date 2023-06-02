@@ -40,6 +40,7 @@ const loginCachier = async (req: Request, res: Response) => {
         name: true,
         email: true,
         titleName: true,
+        associatedPharmacy: true,
         password: true,
       },
     });
@@ -109,6 +110,7 @@ const refreshToken = async (req: Request, res: Response) => {
         name: true,
         email: true,
         titleName: true,
+        associatedPharmacy: true,
       },
     });
 
@@ -213,10 +215,121 @@ const deleteAccount = async (req: Request, res: Response) => {
   }
 };
 
+const sellProducts = async (req: Request, res: Response) => {
+  try {
+    // Get the list of products from the request body.
+    let { products } = req.body;
+
+    // Check if the products array exist and if there is at least one product
+    if (!products || products?.length < 1) {
+      return res.status(400).json({
+        message:
+          'Please provide us a list of products make sure that at least one product is inside it.',
+      });
+    }
+
+    // Check if each object contains a productId and quantity minimum.
+    const isValidData = products.every(({ productId, quantity }: any) => {
+      return productId && quantity;
+    });
+    if (!isValidData) {
+      return res.status(400).json({
+        message:
+          'Please make sure that every product in the products list has at least a productId and a quantity.',
+      });
+    }
+
+    // Calculate the total amount.
+    let totalAmount = 0;
+    await Promise.all(
+      products.map(async ({ productId, quantity }: any) => {
+        // Get the product
+        const product: any = await prisma.product.findUnique({
+          where: { id: productId },
+          select: {
+            amount: true,
+            price: true,
+          },
+        });
+
+        // Check if the amount is enough
+        if (quantity > product?.amount) {
+          products = products.filter((item: any) => {
+            return item.productId !== productId && item.quantity !== quantity;
+          });
+
+          return;
+        }
+
+        totalAmount += product.price * quantity;
+      })
+    );
+
+    // Store that data in db, create a reciept and udpate product's amount.
+    let saleList = await Promise.all(
+      products.map(async ({ productId, quantity }: any) => {
+        const singleSale = await prisma.sale.create({
+          data: {
+            productId,
+            quantity,
+            cachierId: req.user.id,
+          },
+          select: {
+            id: true,
+            quantity: true,
+            date: true,
+            soldProduct: {
+              select: {
+                price: true,
+                pharmacy: {
+                  select: {
+                    name: true,
+                  },
+                },
+                productList: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+            cachierSelling: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        });
+
+        // Update the product's quantity.
+        await prisma.product.update({
+          where: {
+            id: productId,
+          },
+          data: {
+            amount: {
+              decrement: quantity,
+            },
+          },
+        });
+
+        return singleSale;
+      })
+    );
+
+    // Send back a positive response.
+    res.status(201).json({ message: 'Sale completed.', saleList, totalAmount });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
 module.exports = {
   loginCachier,
   refreshToken,
   logout,
   updateCredentiatls,
   deleteAccount,
+  sellProducts,
 };

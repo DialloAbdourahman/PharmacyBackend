@@ -54,6 +54,8 @@ model Cachier {
   creator              String
   pharmacy             Pharmacy      @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
   associatedPharmacy   String        @unique
+
+  sales Sale[]
 }
 
 model Customer {
@@ -103,6 +105,8 @@ model ProductList {
   normalPrice Float
 
   products Product[]
+
+  @@index(fields: [name])
 }
 
 model Product {
@@ -117,6 +121,7 @@ model Product {
   pharmacySelling String
 
   orders Order[]
+  sales  Sale[]
 }
 
 model Order {
@@ -131,6 +136,17 @@ model Order {
   customerId       String
 }
 
+model Sale {
+  id       String   @id @default(uuid())
+  quantity Int
+  date     DateTime @default(now())
+
+  soldProduct    Product @relation(fields: [productId], references: [id])
+  productId      String
+  cachierSelling Cachier @relation(fields: [cachierId], references: [id])
+  cachierId      String
+}
+
 model Complain {
   id      String @id @default(uuid())
   title   String
@@ -138,3 +154,7 @@ model Complain {
 }
 
 // npx prisma migrate dev --name init 
+
+// Hard to be implemented last
+// cancel order. (consider taking an array) (customer and cachier)
+// Searching products efficiently and other stuff I think. We search a product based of the location too. so we need a way to store the address of a product (pharmacy selling that product) (product)

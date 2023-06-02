@@ -9,6 +9,8 @@ const {
   logoutCustomer,
   refreshToken,
   placeOrder,
+  updateAccount,
+  seeOrders,
 } = require('../controllers/customerController');
 
 // Addiional imports
@@ -23,8 +25,10 @@ router.post('/token', refreshToken);
 router.post('/', createCustomer);
 
 // READ ROUTES
+router.get('/orders', auth, seeOrders);
 
 // UPDATE ROUTES
+router.put('/', auth, updateAccount);
 
 // DELETE ROUTES
 
