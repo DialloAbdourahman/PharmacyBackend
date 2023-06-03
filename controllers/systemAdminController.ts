@@ -304,6 +304,8 @@ const createPharmacy = async (req: Request, res: Response) => {
       pharmacyAdminEmail,
       pharmacyAdminPassword,
       pharmacyAllNight,
+      pharmacyLatitude,
+      pharmacyLongitude,
     } = req.body;
 
     // Check if all fields are presendt
@@ -316,7 +318,9 @@ const createPharmacy = async (req: Request, res: Response) => {
       !pharmacyAdminName ||
       !pharmacyAdminEmail ||
       !pharmacyAdminPassword ||
-      !pharmacyAllNight
+      !pharmacyAllNight ||
+      !pharmacyLatitude ||
+      !pharmacyLongitude
     ) {
       return res.status(400).json({ message: 'Please enter all fields' });
     }
@@ -382,6 +386,8 @@ const createPharmacy = async (req: Request, res: Response) => {
         hourly: pharmacyHourly,
         allNight: pharmacyAllNight,
         creator: req.user.id,
+        latitude: pharmacyLatitude,
+        longitude: pharmacyLongitude,
         pharmacyAdmin: {
           create: {
             name: pharmacyAdminName,

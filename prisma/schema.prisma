@@ -89,6 +89,8 @@ model Pharmacy {
   address     String
   hourly      String
   allNight    Boolean
+  latitude    Float
+  longitude   Float
 
   systemAdminCreator SystemAdmin @relation(fields: [creator], references: [id])
   creator            String
@@ -116,7 +118,7 @@ model Product {
   reserved Boolean @default(false)
 
   productList     ProductList @relation(fields: [product], references: [id], onDelete: Cascade)
-  product         String      @unique
+  product         String
   pharmacy        Pharmacy    @relation(fields: [pharmacySelling], references: [id], onDelete: Cascade)
   pharmacySelling String
 
@@ -155,6 +157,8 @@ model Complain {
 
 // npx prisma migrate dev --name init 
 
+// Do not allow a pharmacy admin to create a product that his pharmacy has already. Suggest him to change the amount instead
+// See all the orders of a pharmacy (pharmacy admin and cachier)
+
 // Hard to be implemented last
 // cancel order. (consider taking an array) (customer and cachier)
-// Searching products efficiently and other stuff I think. We search a product based of the location too. so we need a way to store the address of a product (pharmacy selling that product) (product)

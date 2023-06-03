@@ -20,6 +20,7 @@ const pharmacyAdminRouter = require('../routers/pharmacyAdminRouter');
 const cachierRouter = require('../routers/cachierRouter');
 const customerRouter = require('../routers/customerRouter');
 const pharmacyRouter = require('../routers/pharmacyRouter');
+const productRouter = require('../routers/productRouter');
 
 // Adding user and token on the request object.
 declare global {
@@ -36,6 +37,7 @@ app.use('/api/pharmacyAdmin', pharmacyAdminRouter);
 app.use('/api/cachier', cachierRouter);
 app.use('/api/customer', customerRouter);
 app.use('/api/pharmacy', pharmacyRouter);
+app.use('/api/product', productRouter);
 
 // Exporting the app module
 module.exports = app;

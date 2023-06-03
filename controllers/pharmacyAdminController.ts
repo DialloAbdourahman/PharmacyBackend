@@ -374,7 +374,11 @@ const seeAllPharmacyAdmins = async (req: Request, res: Response) => {
 const seeAllCachiers = async (req: Request, res: Response) => {
   try {
     // Get all the cachiers.
-    const cachiers = await prisma.cachier.findMany({});
+    const cachiers = await prisma.cachier.findMany({
+      where: {
+        associatedPharmacy: req.user.associatedPharmacy,
+      },
+    });
 
     // Send a positive response
     res.status(200).json(cachiers);
@@ -389,7 +393,9 @@ const seeCachier = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     // Get the cachier
-    const cachier = await prisma.cachier.findUnique({ where: { id } });
+    const cachier = await prisma.cachier.findUnique({
+      where: { id, associatedPharmacy: req.user.associatedPharmacy },
+    });
 
     // Send a positive response
     res.status(200).json(cachier);
