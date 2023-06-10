@@ -10,7 +10,11 @@ const {
   deleteAccount,
   sellProducts,
 } = require('../controllers/cachierController');
-const { seeOurProducts } = require('../controllers/pharmacyAdminController');
+const {
+  seeOurProducts,
+  seeAllOrders,
+  seeAllSales,
+} = require('../controllers/pharmacyAdminController');
 
 // Addiional imports
 const { authCachier: auth } = require('../middlewares/auth');
@@ -23,6 +27,8 @@ router.post('/sell', auth, sellProducts);
 
 // READ ROUTES
 router.get('/seeOurProducts', auth, seeOurProducts);
+router.get('/seeAllOrders', auth, seeAllOrders);
+router.get('/seeAllSales', auth, seeAllSales);
 
 // UPDATE ROUTES
 router.put('/', auth, updateCredentiatls);

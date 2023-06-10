@@ -588,6 +588,75 @@ const updateProduct = async (req: Request, res: Response) => {
   }
 };
 
+const allPharmacies = async (req: Request, res: Response) => {
+  try {
+    // Get relevant data from request body
+    let { name, page } = req.body;
+
+    // Configure the pages. Here, the first page will be 1.
+    const itemPerPage = 10;
+    page = page - 1;
+
+    // Get all pharmacies from db.
+    const pharmacies = await prisma.pharmacy.findMany({
+      take: itemPerPage,
+      skip: itemPerPage * page,
+      where: {
+        name: {
+          contains: name,
+          mode: 'insensitive',
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phoneNumber: true,
+        address: true,
+        hourly: true,
+        allNight: true,
+        latitude: true,
+        longitude: true,
+        creator: true,
+        systemAdminCreator: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    // Send back a positive response
+    res.status(200).json(pharmacies);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the product to be deleted.
+    const { id } = req.params;
+
+    // Delete the product from product list.
+    await prisma.productList.delete({
+      where: {
+        id,
+      },
+    });
+
+    // Return back a positive response
+    res
+      .status(200)
+      .json({
+        message: 'Product has been deleted from product list successfully.',
+      });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
 module.exports = {
   createSystemAdmin,
   loginSystemAdmin,
@@ -602,4 +671,6 @@ module.exports = {
   seeProducts,
   seeProduct,
   updateProduct,
+  allPharmacies,
+  deleteProduct,
 };

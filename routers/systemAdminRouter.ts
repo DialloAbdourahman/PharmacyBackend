@@ -16,6 +16,8 @@ const {
   seeProducts,
   seeProduct,
   updateProduct,
+  allPharmacies,
+  deleteProduct,
 } = require('../controllers/systemAdminController');
 
 // Additional imports
@@ -32,6 +34,7 @@ router.post('/', auth, createSystemAdmin);
 // READ ROUTES
 router.get('/seeProducts', auth, seeProducts);
 router.get('/seeProduct/:id', auth, seeProduct);
+router.get('/allPharmacies', auth, allPharmacies);
 router.get('/', auth, allSystemAdmins);
 
 // UPDATE ROUTES
@@ -41,5 +44,6 @@ router.put('/', auth, updateSystemAdmin);
 
 // DELETE ROUTES
 router.delete('/deletePharmacy/:id', auth, deletePharmacy);
+router.delete('/deleteProduct/:id', auth, deleteProduct);
 
 module.exports = router;

@@ -18,6 +18,8 @@ const {
   deleteProduct,
   seeOurProducts,
   seeOneOFOurProduct,
+  seeAllOrders,
+  seeAllSales,
 } = require('../controllers/pharmacyAdminController');
 
 // Addiional imports
@@ -36,6 +38,8 @@ router.get('/seeAllCachiers', auth, seeAllCachiers);
 router.get('/seeCachier/:id', auth, seeCachier);
 router.get('/seeOurProducts', auth, seeOurProducts);
 router.get('/seeOneOFOurProduct/:id', auth, seeOneOFOurProduct);
+router.get('/seeAllOrders', auth, seeAllOrders);
+router.get('/seeAllSales', auth, seeAllSales);
 router.get('/', auth, seeAllPharmacyAdmins);
 
 // UPDATE ROUTES

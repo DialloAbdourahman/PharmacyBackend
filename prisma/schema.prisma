@@ -157,8 +157,4 @@ model Complain {
 
 // npx prisma migrate dev --name init 
 
-// Do not allow a pharmacy admin to create a product that his pharmacy has already. Suggest him to change the amount instead
-// See all the orders of a pharmacy (pharmacy admin and cachier)
-
-// Hard to be implemented last
 // cancel order. (consider taking an array) (customer and cachier)

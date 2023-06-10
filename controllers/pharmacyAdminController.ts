@@ -417,7 +417,9 @@ const createProduct = async (req: Request, res: Response) => {
       },
     });
     if (productExists) {
-      return res.status(400).json({ message: 'Product exists already.' });
+      return res.status(400).json({
+        message: 'Product exists already, just increment the amount.',
+      });
     }
 
     // Check if all the required data is entered.
@@ -573,6 +575,46 @@ const seeOneOFOurProduct = async (req: Request, res: Response) => {
   }
 };
 
+const seeAllOrders = async (req: Request, res: Response) => {
+  try {
+    // Get all the orders from db
+    const orders = await prisma.order.findMany({
+      where: {
+        orderedProduct: {
+          pharmacy: {
+            id: req.user.associatedPharmacy,
+          },
+        },
+      },
+    });
+
+    // Send back a positive response.
+    res.status(200).json(orders);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const seeAllSales = async (req: Request, res: Response) => {
+  try {
+    // Get the sales from the db.
+    const sales = await prisma.sale.findMany({
+      where: {
+        soldProduct: {
+          pharmacy: {
+            id: req.user.associatedPharmacy,
+          },
+        },
+      },
+    });
+
+    // Send back a positive response
+    res.status(200).json(sales);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
 module.exports = {
   loginPharmacyAdmin,
   refreshToken,
@@ -589,4 +631,6 @@ module.exports = {
   deleteProduct,
   seeOurProducts,
   seeOneOFOurProduct,
+  seeAllOrders,
+  seeAllSales,
 };
