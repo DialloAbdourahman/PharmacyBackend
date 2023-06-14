@@ -2,6 +2,7 @@
 import express from 'express';
 const cors = require('cors');
 const app = express();
+const cookieParser = require('cookie-parser');
 
 // Express configurations.
 app.use(
@@ -13,6 +14,9 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+//Middleware for cookies
+app.use(cookieParser());
 
 // All the routers import
 const systemAdminRouter = require('../routers/systemAdminRouter');

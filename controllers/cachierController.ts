@@ -75,13 +75,18 @@ const loginCachier = async (req: Request, res: Response) => {
       },
     });
 
+    // Creates Secure Cookie with refresh token
+    res.cookie('refreshToken', refreshToken, {
+      secure: process.env.NODE_ENVIRONMENT !== 'development',
+      httpOnly: true,
+    });
+
     // Send back response.
     res.status(200).json({
       name: cachier.name,
       email: cachier.email,
       title: cachier.titleName,
       accessToken,
-      refreshToken,
     });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
@@ -90,8 +95,12 @@ const loginCachier = async (req: Request, res: Response) => {
 
 const refreshToken = async (req: Request, res: Response) => {
   try {
-    // Get the refresh token from the Headers
-    let refreshToken: any = req.header('Authorization')?.replace('Bearer ', '');
+    // Get the refresh token from the Headers (cookie)
+    const cookies = req.cookies;
+    if (!cookies?.refreshToken) {
+      return res.status(401).json({ message: 'No refresh token found.' });
+    }
+    const refreshToken = cookies.refreshToken;
 
     // Decode the refresh token
     const decoded = jwt.verify(
