@@ -156,5 +156,6 @@ model Complain {
 }
 
 // npx prisma migrate dev --name init 
+// Delete the cookie refresh token when the user logs out.
 // Check the delete product from product list on postman (system admin only)
 // cancel order. (consider taking an array) (customer and cachier)
