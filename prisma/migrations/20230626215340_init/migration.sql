@@ -68,6 +68,8 @@ CREATE TABLE "Pharmacy" (
     "address" TEXT NOT NULL,
     "hourly" TEXT NOT NULL,
     "allNight" BOOLEAN NOT NULL,
+    "latitude" DOUBLE PRECISION NOT NULL,
+    "longitude" DOUBLE PRECISION NOT NULL,
     "creator" TEXT NOT NULL,
 
     CONSTRAINT "Pharmacy_pkey" PRIMARY KEY ("id")
@@ -98,13 +100,24 @@ CREATE TABLE "Product" (
 -- CreateTable
 CREATE TABLE "Order" (
     "id" TEXT NOT NULL,
-    "quantity" INTEGER[],
+    "quantity" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "fulfilled" BOOLEAN NOT NULL DEFAULT false,
-    "product" TEXT NOT NULL,
-    "customer" TEXT NOT NULL,
+    "productId" TEXT NOT NULL,
+    "customerId" TEXT NOT NULL,
 
     CONSTRAINT "Order_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Sale" (
+    "id" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "productId" TEXT NOT NULL,
+    "cachierId" TEXT NOT NULL,
+
+    CONSTRAINT "Sale_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -144,7 +157,7 @@ CREATE UNIQUE INDEX "Pharmacy_phoneNumber_key" ON "Pharmacy"("phoneNumber");
 CREATE UNIQUE INDEX "ProductList_name_key" ON "ProductList"("name");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Product_product_key" ON "Product"("product");
+CREATE INDEX "ProductList_name_idx" ON "ProductList"("name");
 
 -- AddForeignKey
 ALTER TABLE "SystemAdmin" ADD CONSTRAINT "SystemAdmin_titleName_fkey" FOREIGN KEY ("titleName") REFERENCES "UserType"("name") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -183,7 +196,13 @@ ALTER TABLE "Product" ADD CONSTRAINT "Product_product_fkey" FOREIGN KEY ("produc
 ALTER TABLE "Product" ADD CONSTRAINT "Product_pharmacySelling_fkey" FOREIGN KEY ("pharmacySelling") REFERENCES "Pharmacy"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_product_fkey" FOREIGN KEY ("product") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Order" ADD CONSTRAINT "Order_customer_fkey" FOREIGN KEY ("customer") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Order" ADD CONSTRAINT "Order_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sale" ADD CONSTRAINT "Sale_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Sale" ADD CONSTRAINT "Sale_cachierId_fkey" FOREIGN KEY ("cachierId") REFERENCES "Cachier"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
