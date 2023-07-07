@@ -25,7 +25,7 @@ const authSystemAdmin = async (
     );
 
     // Decode the accessToken
-    if (decoded.data.titleName !== 'system_admin') {
+    if (decoded.data.titleName !== 'systemAdmin') {
       throw new Error();
     }
 
@@ -62,7 +62,7 @@ const authPharmacyAdmin = async (
     );
 
     // Decode the accessToken
-    if (decoded.data.titleName !== 'pharmacy_admin') {
+    if (decoded.data.titleName !== 'pharmacyAdmin') {
       throw new Error();
     }
 
