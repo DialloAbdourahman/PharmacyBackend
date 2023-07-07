@@ -59,7 +59,7 @@ const createSystemAdmin = async (req: Request, res: Response) => {
         name,
         email,
         password,
-        creator: null,
+        creator: req.user.id,
       },
     });
 

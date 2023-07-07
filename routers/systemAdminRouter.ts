@@ -29,7 +29,7 @@ router.post('/token', refreshToken);
 router.post('/logout', auth, logout);
 router.post('/createPharmacy', auth, createPharmacy);
 router.post('/createProduct', auth, createProduct);
-router.post('/', createSystemAdmin);
+router.post('/', auth, createSystemAdmin);
 
 // READ ROUTES
 router.get('/seeProducts', auth, seeProducts);
