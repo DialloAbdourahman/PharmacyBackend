@@ -137,6 +137,9 @@ const refreshToken = async (req: Request, res: Response) => {
 
     // Send the access token to the system admin
     res.status(200).json({
+      name: cachier.name,
+      email: cachier.email,
+      title: cachier.titleName,
       accessToken,
     });
   } catch (error) {

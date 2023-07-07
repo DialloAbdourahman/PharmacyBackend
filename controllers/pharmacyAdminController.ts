@@ -140,6 +140,9 @@ const refreshToken = async (req: Request, res: Response) => {
 
     // Send the access token to the system admin
     res.status(200).json({
+      name: pharmacyAdmin.name,
+      email: pharmacyAdmin.email,
+      title: pharmacyAdmin.titleName,
       accessToken,
     });
   } catch (error) {
