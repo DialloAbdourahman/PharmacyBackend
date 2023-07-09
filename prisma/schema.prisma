@@ -100,11 +100,23 @@ model Pharmacy {
   products      Product[]
 }
 
+model ProductCategory {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+  imageUrl    String
+
+  productList ProductList[]
+}
+
 model ProductList {
   id          String @id @default(uuid())
   name        String @unique
   description String
   normalPrice Float
+
+  productCategory ProductCategory @relation(fields: [category], references: [id])
+  category        String
 
   products Product[]
 

@@ -494,7 +494,7 @@ const updatePharmacy = async (req: Request, res: Response) => {
 const createProduct = async (req: Request, res: Response) => {
   try {
     // Get all the required data from the request body
-    const { name, description, normalPrice } = req.body;
+    const { name, description, normalPrice, category } = req.body;
 
     // Check of the field have been entered
     if (!name || !description || !normalPrice) {
@@ -517,6 +517,7 @@ const createProduct = async (req: Request, res: Response) => {
         name,
         description,
         normalPrice,
+        category,
       },
     });
 
@@ -666,6 +667,92 @@ const deleteProduct = async (req: Request, res: Response) => {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
 };
+
+// const createCategory = async (req: Request, res: Response) => {
+//   try {
+//     // Get all the information from request body.
+//     const { name, description } = req.body;
+
+//     // Create the category
+//     const category = await prisma.productCategory.create({
+//       data: {
+//         name,
+//         description,
+//         imageUrl: 'test.png',
+//       },
+//     });
+
+//     // Send back a positive response
+//     res.status(201).json({ message: 'Category created successfully.' });
+//   } catch (error) {
+//     return res.status(500).json({ message: 'Something went wrong.', error });
+//   }
+// };
+
+// const deleteCategory = async (req: Request, res: Response) => {
+//   try {
+//     // Get the id of the category from the request params
+//     const { id } = req.params;
+
+//     // Delete the category
+//     await prisma.productCategory.delete({
+//       where: {
+//         id,
+//       },
+//     });
+
+//     // Send back a positive response
+//     res
+//       .status(200)
+//       .json({ message: 'Category has been deleted successfully.' });
+//   } catch (error) {
+//     return res.status(500).json({ message: 'Something went wrong.', error });
+//   }
+// };
+
+// const updateCategory = async (req: Request, res: Response) => {
+//   try {
+//     // Get the id of the category from the request params
+//     const { id } = req.params;
+
+//     // Get the enteries and create a valid enteries array
+//     const enteries = Object.keys(req.body);
+
+//     if (enteries.length < 1) {
+//       return res.status(400).json({ message: 'Please provide data to us.' });
+//     }
+
+//     const allowedEntery = ['name', 'description'];
+
+//     // Check if the enteries are valid
+//     const isValidOperation = enteries.every((entery) => {
+//       return allowedEntery.includes(entery);
+//     });
+
+//     // Send negative response if the enteries are not allowed.
+//     if (!isValidOperation) {
+//       res.status(400).send({
+//         message: 'You are trying to update data you are not allowed to',
+//       });
+//       return;
+//     }
+
+//     // Update the category
+//     await prisma.productCategory.update({
+//       where: { id },
+//       data: {
+//         ...req.body,
+//       },
+//     });
+
+//     // Send back a positive response
+//     res
+//       .status(200)
+//       .json({ message: 'Category has been deleted successfully.' });
+//   } catch (error) {
+//     return res.status(500).json({ message: 'Something went wrong.', error });
+//   }
+// };
 
 module.exports = {
   createSystemAdmin,
