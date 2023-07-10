@@ -320,10 +320,10 @@ const createPharmacy = async (req: Request, res: Response) => {
       pharmacyLongitude,
     } = req.body;
 
-    // Check if all fields are presendt
+    // Check if all fields are present
     if (
       !pharmacyName ||
-      !pharmacyAdminEmail ||
+      !pharmacyEmail ||
       !pharmacyPhoneNumber ||
       !pharmacyAddress ||
       !pharmacyHourly ||

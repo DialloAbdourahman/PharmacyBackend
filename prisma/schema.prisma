@@ -15,7 +15,7 @@ model SystemAdmin {
   refreshToken String?
 
   title              UserType     @relation(fields: [titleName], references: [name])
-  titleName          String       @default("system_admin")
+  titleName          String       @default("systemAdmin")
   systemAdminCreator SystemAdmin? @relation(fields: [creator], references: [id], name: "system admins created")
   creator            String?
 
@@ -31,7 +31,7 @@ model PharmacyAdmin {
   refreshToken String?
 
   title                UserType       @relation(fields: [titleName], references: [name])
-  titleName            String         @default("pharmacy_admin")
+  titleName            String         @default("pharmacyAdmin")
   pharmacy             Pharmacy       @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
   associatedPharmacy   String
   pharmacyAdminCreator PharmacyAdmin? @relation(fields: [creator], references: [id], name: "pharmacyAdminsCreated")
