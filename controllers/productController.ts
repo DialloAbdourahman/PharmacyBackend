@@ -7,6 +7,8 @@ const prisma: PrismaClient<
 > = require('../utils/prismaClient');
 
 const getProducts = async (req: Request, res: Response) => {
+  console.log(req.body);
+
   try {
     // Get required data from request body and modify it a bit.
     let {
