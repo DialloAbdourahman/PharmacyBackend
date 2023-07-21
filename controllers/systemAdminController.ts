@@ -603,8 +603,9 @@ const updateProduct = async (req: Request, res: Response) => {
 
 const allPharmacies = async (req: Request, res: Response) => {
   try {
-    // Get relevant data from request body
-    let { name, page } = req.body;
+    // Get relevant data from request query
+    let name: string = String(req.query.name);
+    let page: number = Number(req.query.page);
 
     // Configure the pages. Here, the first page will be 1.
     const itemPerPage = 10;
