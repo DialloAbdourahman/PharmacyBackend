@@ -21,6 +21,7 @@ const {
   seeAllOrders,
   seeAllSales,
 } = require('../controllers/pharmacyAdminController');
+const { seeProducts } = require('../controllers/systemAdminController');
 
 // Addiional imports
 const { authPharmacyAdmin: auth } = require('../middlewares/auth');
@@ -40,6 +41,7 @@ router.get('/seeOurProducts', auth, seeOurProducts);
 router.get('/seeOneOFOurProduct/:id', auth, seeOneOFOurProduct);
 router.get('/seeAllOrders', auth, seeAllOrders);
 router.get('/seeAllSales', auth, seeAllSales);
+router.get('/seeDrugList', auth, seeProducts);
 router.get('/', auth, seeAllPharmacyAdmins);
 
 // UPDATE ROUTES
