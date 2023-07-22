@@ -457,6 +457,8 @@ const updatePharmacy = async (req: Request, res: Response) => {
       'address',
       'hourly',
       'allNight',
+      'latitude',
+      'longitude',
     ];
 
     // Check if the enteries are valid
@@ -531,7 +533,11 @@ const createProduct = async (req: Request, res: Response) => {
 const seeProducts = async (req: Request, res: Response) => {
   try {
     // Get all the products from the database
-    const products = await prisma.productList.findMany({});
+    const products = await prisma.productList.findMany({
+      include: {
+        productCategory: true,
+      },
+    });
 
     // Send back a positive response
     res.status(200).json(products);
@@ -567,7 +573,7 @@ const updateProduct = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Please provide data to us.' });
     }
 
-    const allowedEntery = ['name', 'description', 'normalPrice'];
+    const allowedEntery = ['name', 'description', 'normalPrice', 'category'];
 
     // Check if the enteries are valid
     const isValidOperation = enteries.every((entery) => {
