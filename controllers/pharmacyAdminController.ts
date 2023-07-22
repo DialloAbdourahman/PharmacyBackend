@@ -523,8 +523,9 @@ const deleteProduct = async (req: Request, res: Response) => {
 
 const seeOurProducts = async (req: Request, res: Response) => {
   try {
-    // Get the search criteria from request body.
-    let { name, page } = req.body;
+    // Get the search criteria from request query.
+    let name: string = String(req.query.name);
+    let page: number = Number(req.query.page);
 
     // Configure the pages. Here, the first page will be 1.
     const itemPerPage = 10;
@@ -543,14 +544,13 @@ const seeOurProducts = async (req: Request, res: Response) => {
           },
         },
       },
+      // include:{productList:true},
       select: {
         id: true,
         price: true,
         amount: true,
         productList: {
-          select: {
-            name: true,
-          },
+          include: { productCategory: true },
         },
       },
       orderBy: {
