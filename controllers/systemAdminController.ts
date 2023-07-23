@@ -330,7 +330,6 @@ const createPharmacy = async (req: Request, res: Response) => {
       !pharmacyAdminName ||
       !pharmacyAdminEmail ||
       !pharmacyAdminPassword ||
-      !pharmacyAllNight ||
       !pharmacyLatitude ||
       !pharmacyLongitude
     ) {

@@ -24,31 +24,31 @@ const getProducts = async (req: Request, res: Response) => {
     let skip = itemPerPage * page;
 
     // Getting the products from db.
-    let products;
+    let products: any;
     if (categoryId !== '') {
       products =
-        await prisma.$queryRaw`SELECT "Product".id AS productId, "ProductList".name AS productName, "Product".price AS productPrice, "Product".amount AS productAmount, "Pharmacy".name AS pharmacyName, "Pharmacy".email AS pharmacyEmail,
+        await prisma.$queryRaw`SELECT "Product".id AS productId, "ProductList".image AS productImage,"ProductList".name AS productName, "Product".price AS productPrice, "Product".amount AS productAmount, "Pharmacy".name AS pharmacyName, "Pharmacy".email AS pharmacyEmail,
         (6371000 * Acos (Cos (Radians(${userlatitude})) * Cos(Radians("Pharmacy".latitude)) *
                           Cos(Radians("Pharmacy".longitude) - Radians(${userlongitude}))
                             + Sin (Radians(${userlatitude})) *
                               Sin(Radians(latitude)))
         ) AS distance_m
         FROM   "Product"
-        INNER JOIN "Pharmacy" ON "pharmacySelling" = "Pharmacy".id 
+        INNER JOIN "Pharmacy" ON "pharmacySelling" = "Pharmacy".id
         INNER JOIN "ProductList" ON "product" = "ProductList".id
         WHERE LOWER("ProductList".name) like ${name} AND "ProductList".category = ${categoryId}
         ORDER  BY distance_m
         LIMIT ${itemPerPage} OFFSET ${skip};`;
     } else {
       products =
-        await prisma.$queryRaw`SELECT "Product".id AS productId, "ProductList".name AS productName, "Product".price AS productPrice, "Product".amount AS productAmount, "Pharmacy".name AS pharmacyName, "Pharmacy".email AS pharmacyEmail,
+        await prisma.$queryRaw`SELECT "Product".id AS productId, "ProductList".image AS productImage, "ProductList".name AS productName, "Product".price AS productPrice, "Product".amount AS productAmount, "Pharmacy".name AS pharmacyName, "Pharmacy".email AS pharmacyEmail,
         (6371000 * Acos (Cos (Radians(${userlatitude})) * Cos(Radians("Pharmacy".latitude)) *
                           Cos(Radians("Pharmacy".longitude) - Radians(${userlongitude}))
                             + Sin (Radians(${userlatitude})) *
                               Sin(Radians(latitude)))
         ) AS distance_m
         FROM   "Product"
-        INNER JOIN "Pharmacy" ON "pharmacySelling" = "Pharmacy".id 
+        INNER JOIN "Pharmacy" ON "pharmacySelling" = "Pharmacy".id
         INNER JOIN "ProductList" ON "product" = "ProductList".id
         WHERE LOWER("ProductList".name) like ${name}
         ORDER  BY distance_m

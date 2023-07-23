@@ -53,7 +53,7 @@ model Cachier {
   pharmacyAdminCreator PharmacyAdmin @relation(fields: [creator], references: [id], onDelete: Cascade)
   creator              String
   pharmacy             Pharmacy      @relation(fields: [associatedPharmacy], references: [id], onDelete: Cascade)
-  associatedPharmacy   String        @unique
+  associatedPharmacy   String
 
   sales Sale[]
 }
@@ -101,19 +101,20 @@ model Pharmacy {
 }
 
 model ProductCategory {
-  id          String @id @default(uuid())
-  name        String @unique
+  id          String  @id @default(uuid())
+  name        String  @unique
   description String
-  imageUrl    String
+  imageUrl    String?
 
   productList ProductList[]
 }
 
 model ProductList {
-  id          String @id @default(uuid())
-  name        String @unique
+  id          String  @id @default(uuid())
+  name        String  @unique
   description String
   normalPrice Float
+  image       String?
 
   productCategory ProductCategory @relation(fields: [category], references: [id])
   category        String
