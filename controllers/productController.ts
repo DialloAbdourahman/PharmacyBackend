@@ -31,7 +31,7 @@ const getProducts = async (req: Request, res: Response) => {
         (6371000 * Acos (Cos (Radians(${userlatitude})) * Cos(Radians("Pharmacy".latitude)) *
                           Cos(Radians("Pharmacy".longitude) - Radians(${userlongitude}))
                             + Sin (Radians(${userlatitude})) *
-                              Sin(Radians(latitude)))
+                              Sin(Radians("Pharmacy".latitude)))
         ) AS distance_m
         FROM   "Product"
         INNER JOIN "Pharmacy" ON "pharmacySelling" = "Pharmacy".id
@@ -45,7 +45,7 @@ const getProducts = async (req: Request, res: Response) => {
         (6371000 * Acos (Cos (Radians(${userlatitude})) * Cos(Radians("Pharmacy".latitude)) *
                           Cos(Radians("Pharmacy".longitude) - Radians(${userlongitude}))
                             + Sin (Radians(${userlatitude})) *
-                              Sin(Radians(latitude)))
+                              Sin(Radians("Pharmacy".latitude)))
         ) AS distance_m
         FROM   "Product"
         INNER JOIN "Pharmacy" ON "pharmacySelling" = "Pharmacy".id
