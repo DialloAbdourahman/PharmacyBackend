@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Prisma, PrismaClient } from '@prisma/client';
+// const haversine = require('haversine');
 const prisma: PrismaClient<
   Prisma.PrismaClientOptions,
   never,
@@ -8,78 +9,54 @@ const prisma: PrismaClient<
 
 const getProducts = async (req: Request, res: Response) => {
   try {
-    // Get required data from request body and modify it a bit.
-    let {
-      name,
-      latitude: userlatitude,
-      longitude: userlongitude,
-      page,
-      categoryId,
-    } = req.body;
-    name = `%${name.toLowerCase()}%`;
+    // Get relevant data from request query and modify it a bit.
+    let name: string = String(req.query.name).toLowerCase();
+    let page: number = Number(req.query.page);
+    let userlatitude: number = Number(req.query.latitude);
+    let userlongitude: number = Number(req.query.longitude);
+    let categoryId: string = String(req.query.categoryId);
 
     // Pagination stuff here
     const itemPerPage = 10;
     page = page - 1;
     let skip = itemPerPage * page;
 
-    // Getting the products from db.
-    let products: any;
-    if (categoryId !== '') {
-      products =
-        await prisma.$queryRaw`SELECT "Product".id AS productId, "ProductList".image AS productImage,"ProductList".name AS productName, "Product".price AS productPrice, "Product".amount AS productAmount, "Pharmacy".name AS pharmacyName, "Pharmacy".email AS pharmacyEmail,
-        (6371000 * Acos (Cos (Radians(${userlatitude})) * Cos(Radians("Pharmacy".latitude)) *
+    // Construction the unsafe query.
+    const query = `SELECT "Product".id AS productId, "ProductList".image AS productImage,"ProductList".name AS productName, "Product".price AS productPrice, "Product".amount AS productAmount, "Pharmacy".name AS pharmacyName, "Pharmacy".email AS pharmacyEmail ${
+      userlatitude !== 0 && userlongitude !== 0
+        ? `,
+      (6371000 * Acos (Cos (Radians(${userlatitude})) * Cos(Radians("Pharmacy".latitude)) *
                           Cos(Radians("Pharmacy".longitude) - Radians(${userlongitude}))
                             + Sin (Radians(${userlatitude})) *
                               Sin(Radians("Pharmacy".latitude)))
-        ) AS distance_m
-        FROM   "Product"
-        INNER JOIN "Pharmacy" ON "pharmacySelling" = "Pharmacy".id
-        INNER JOIN "ProductList" ON "product" = "ProductList".id
-        WHERE LOWER("ProductList".name) like ${name} AND "ProductList".category = ${categoryId}
-        ORDER  BY distance_m
-        LIMIT ${itemPerPage} OFFSET ${skip};`;
-    } else {
-      products =
-        await prisma.$queryRaw`SELECT "Product".id AS productId, "ProductList".image AS productImage, "ProductList".name AS productName, "Product".price AS productPrice, "Product".amount AS productAmount, "Pharmacy".name AS pharmacyName, "Pharmacy".email AS pharmacyEmail,
-        (6371000 * Acos (Cos (Radians(${userlatitude})) * Cos(Radians("Pharmacy".latitude)) *
-                          Cos(Radians("Pharmacy".longitude) - Radians(${userlongitude}))
-                            + Sin (Radians(${userlatitude})) *
-                              Sin(Radians("Pharmacy".latitude)))
-        ) AS distance_m
-        FROM   "Product"
-        INNER JOIN "Pharmacy" ON "pharmacySelling" = "Pharmacy".id
-        INNER JOIN "ProductList" ON "product" = "ProductList".id
-        WHERE LOWER("ProductList".name) like ${name}
-        ORDER  BY distance_m
-        LIMIT ${itemPerPage} OFFSET ${skip};`;
+      ) AS distance_m`
+        : ''
     }
+    FROM   "Product"
+    INNER JOIN "Pharmacy" ON "pharmacySelling" = "Pharmacy".id
+    INNER JOIN "ProductList" ON "product" = "ProductList".id
+    WHERE "Product".amount > 0 ${
+      name && `AND LOWER("ProductList".name) like '%${name}%'`
+    } ${categoryId && `AND "ProductList".category = '${categoryId}'`}
+    ${userlatitude !== 0 && userlongitude !== 0 ? `ORDER  BY distance_m` : ''}
+    LIMIT ${itemPerPage} OFFSET ${skip};`;
+
+    // Getting the products from db.
+    const products: any = await prisma.$queryRawUnsafe(query);
+
+    // Map the correct image url.
+    const productsWithCorrectImageUrl = products.map((product: any) => {
+      return {
+        ...product,
+        productimage: `http://localhost:4000/static/productImages/${product.productimage}`,
+      };
+    });
 
     // Send back a positive response.
-    res.status(200).json(products);
+    res.status(200).json(productsWithCorrectImageUrl);
   } catch (error) {
     res.status(401).json({ message: 'Something went wrong.', error });
   }
 };
 
 module.exports = { getProducts };
-
-// Haversine formula
-// const result = await prisma.$queryRaw`SELECT *,
-//        (6371000 * Acos (Cos (Radians(${userlatitude})) * Cos(Radians(latitude)) *
-//                          Cos(Radians(longitude) - Radians(${userlongitude}))
-//                            + Sin (Radians(${userlatitude})) *
-//                              Sin(Radians(latitude)))
-//                ) AS distance_m
-//        FROM   "Pharmacy"
-//        HAVING distance_m < 100
-//        ORDER  BY distance_m;`;
-
-// const result2 = await prisma.$queryRaw`SELECT *,
-//     (6371 * Acos (Cos (Radians(${userlatitude})) * Cos(Radians(latitude)) *
-//                       Cos(Radians(longitude) - Radians(${userlongitude}))
-//                         + Sin (Radians(${userlatitude})) *
-//                           Sin(Radians(latitude)))
-//     ) AS distance_km
-//     FROM   "Pharmacy"
-//     ORDER  BY distance_km;`;

@@ -8,8 +8,30 @@ const prisma: PrismaClient<
 
 const seeAllPharmacies = async (req: Request, res: Response) => {
   try {
+    // Get relevant data from request query
+    let name: string = String(req.query.name);
+    let page: number = Number(req.query.page);
+
+    // Configure the pages. Here, the first page will be 1.
+    const itemPerPage = 10;
+    page = page - 1;
+
     // Get all the pharmacies
-    const pharmacies = await prisma.pharmacy.findMany({});
+    const pharmacies = await prisma.pharmacy.findMany({
+      take: itemPerPage,
+      skip: itemPerPage * page,
+      where: {
+        name: {
+          contains: name,
+          mode: 'insensitive',
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
 
     // Send a positive response
     res.status(200).json(pharmacies);

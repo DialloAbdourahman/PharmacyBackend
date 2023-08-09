@@ -7,7 +7,7 @@ const { getProducts } = require('../controllers/productController');
 // CREATE ROUTES
 
 // READ ROUTES
-router.post('/', getProducts);
+router.get('/', getProducts);
 
 // UPDATE ROUTES
 

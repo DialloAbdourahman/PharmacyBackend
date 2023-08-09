@@ -3,6 +3,7 @@ import { Prisma, PrismaClient } from '@prisma/client';
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+import Jimp from 'jimp';
 const prisma: PrismaClient<
   Prisma.PrismaClientOptions,
   never,
@@ -12,6 +13,7 @@ const {
   generateAccessToken,
   generateRefreshToken,
 } = require('../utils/generateAuthToken');
+const { generateRandomImageName, deleteFile } = require('../utils/helper');
 
 const createSystemAdmin = async (req: Request, res: Response) => {
   try {
@@ -531,8 +533,24 @@ const createProduct = async (req: Request, res: Response) => {
 
 const seeProducts = async (req: Request, res: Response) => {
   try {
+    // Get relevant data from request query
+    let name: string = String(req.query.name);
+    let page: number = Number(req.query.page);
+
+    // Configure the pages. Here, the first page will be 1.
+    const itemPerPage = 10;
+    page = page - 1;
+
     // Get all the products from the database
     const products = await prisma.productList.findMany({
+      take: itemPerPage,
+      skip: itemPerPage * page,
+      where: {
+        name: {
+          contains: name,
+          mode: 'insensitive',
+        },
+      },
       include: {
         productCategory: true,
       },
@@ -659,11 +677,17 @@ const deleteProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     // Delete the product from product list.
-    await prisma.productList.delete({
+    const product = await prisma.productList.delete({
       where: {
         id,
       },
     });
+
+    // Check if the product has an image already and delete it.
+    if (product.image) {
+      const link = './public/productImages';
+      await deleteFile(link, product.image);
+    }
 
     // Return back a positive response
     res.status(200).json({
@@ -674,91 +698,286 @@ const deleteProduct = async (req: Request, res: Response) => {
   }
 };
 
-// const createCategory = async (req: Request, res: Response) => {
-//   try {
-//     // Get all the information from request body.
-//     const { name, description } = req.body;
+const createCategory = async (req: Request, res: Response) => {
+  try {
+    // Get all the information from request body.
+    const { name, description } = req.body;
 
-//     // Create the category
-//     const category = await prisma.productCategory.create({
-//       data: {
-//         name,
-//         description,
-//         imageUrl: 'test.png',
-//       },
-//     });
+    // Create the category
+    const category = await prisma.productCategory.create({
+      data: {
+        name,
+        description,
+      },
+    });
 
-//     // Send back a positive response
-//     res.status(201).json({ message: 'Category created successfully.' });
-//   } catch (error) {
-//     return res.status(500).json({ message: 'Something went wrong.', error });
-//   }
-// };
+    // Send back a positive response
+    res.status(201).json({ message: 'Category created successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
 
-// const deleteCategory = async (req: Request, res: Response) => {
-//   try {
-//     // Get the id of the category from the request params
-//     const { id } = req.params;
+const productCategoryImageUpload = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the category from the request params.
+    const { id } = req.params;
 
-//     // Delete the category
-//     await prisma.productCategory.delete({
-//       where: {
-//         id,
-//       },
-//     });
+    // Check if an image has been provided
+    if (!req.file) {
+      return res.status(400).json({ message: 'Please, provide an image.' });
+    }
 
-//     // Send back a positive response
-//     res
-//       .status(200)
-//       .json({ message: 'Category has been deleted successfully.' });
-//   } catch (error) {
-//     return res.status(500).json({ message: 'Something went wrong.', error });
-//   }
-// };
+    // Get the category
+    const category = await prisma.productCategory.findUnique({ where: { id } });
 
-// const updateCategory = async (req: Request, res: Response) => {
-//   try {
-//     // Get the id of the category from the request params
-//     const { id } = req.params;
+    // Check if the category exists
+    if (!category) {
+      return res.status(400).json({ message: 'The category does not exist.' });
+    }
 
-//     // Get the enteries and create a valid enteries array
-//     const enteries = Object.keys(req.body);
+    // Check if the category has an image already and delete it.
+    if (category.imageUrl) {
+      const link = './public/categoryImages';
 
-//     if (enteries.length < 1) {
-//       return res.status(400).json({ message: 'Please provide data to us.' });
-//     }
+      await deleteFile(link, category.imageUrl);
+    }
 
-//     const allowedEntery = ['name', 'description'];
+    // Shrink the image and save it.
+    const buffer: Buffer = req.file?.buffer;
+    const imageName = generateRandomImageName();
+    Jimp.read(buffer, (err, lenna) => {
+      if (err) throw err;
+      lenna
+        .resize(256, 256)
+        .quality(60)
+        .greyscale()
+        .write(`public/categoryImages/${imageName}`);
+    });
 
-//     // Check if the enteries are valid
-//     const isValidOperation = enteries.every((entery) => {
-//       return allowedEntery.includes(entery);
-//     });
+    // Update the category image in the database
+    await prisma.productCategory.update({
+      where: { id: category.id },
+      data: {
+        imageUrl: imageName,
+      },
+    });
 
-//     // Send negative response if the enteries are not allowed.
-//     if (!isValidOperation) {
-//       res.status(400).send({
-//         message: 'You are trying to update data you are not allowed to',
-//       });
-//       return;
-//     }
+    // Send back a positive status code
+    res.status(201).json({ message: 'Category image uploaded successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
 
-//     // Update the category
-//     await prisma.productCategory.update({
-//       where: { id },
-//       data: {
-//         ...req.body,
-//       },
-//     });
+const deleteCategory = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the category from the request params
+    const { id } = req.params;
 
-//     // Send back a positive response
-//     res
-//       .status(200)
-//       .json({ message: 'Category has been deleted successfully.' });
-//   } catch (error) {
-//     return res.status(500).json({ message: 'Something went wrong.', error });
-//   }
-// };
+    // Delete the category
+    const category = await prisma.productCategory.delete({
+      where: {
+        id,
+      },
+    });
+
+    // Check if the category has an image already and delete it.
+    if (category.imageUrl) {
+      const link = './public/categoryImages';
+      await deleteFile(link, category.imageUrl);
+    }
+
+    // Send back a positive response
+    res
+      .status(200)
+      .json({ message: 'Category has been deleted successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const deleteCategoryImage = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the category from the request params
+    const { id } = req.params;
+
+    // Delete the category
+    const category = await prisma.productCategory.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    // Check if the category exists
+    if (!category) {
+      return res.status(500).json({ message: 'Category does not exist.' });
+    }
+
+    // Check if the category doesn't have an image
+    if (!category?.imageUrl) {
+      return res.status(500).json({ message: 'No image to be deleted.' });
+    }
+
+    // Delete the category image
+    const link = './public/categoryImages';
+    await deleteFile(link, category.imageUrl);
+
+    // Update the category image in the database
+    await prisma.productCategory.update({
+      where: { id: category.id },
+      data: {
+        imageUrl: null,
+      },
+    });
+
+    // Send back a positive response
+    res
+      .status(200)
+      .json({ message: 'Category image has been deleted successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const updateCategory = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the category from the request params
+    const { id } = req.params;
+
+    // Get the enteries and create a valid enteries array
+    const enteries = Object.keys(req.body);
+
+    if (enteries.length < 1) {
+      return res.status(400).json({ message: 'Please provide data to us.' });
+    }
+
+    const allowedEntery = ['name', 'description'];
+
+    // Check if the enteries are valid
+    const isValidOperation = enteries.every((entery) => {
+      return allowedEntery.includes(entery);
+    });
+
+    // Send negative response if the enteries are not allowed.
+    if (!isValidOperation) {
+      res.status(400).send({
+        message: 'You are trying to update data you are not allowed to',
+      });
+      return;
+    }
+
+    // Update the category
+    await prisma.productCategory.update({
+      where: { id },
+      data: {
+        ...req.body,
+      },
+    });
+
+    // Send back a positive response
+    res
+      .status(200)
+      .json({ message: 'Category has been updated successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const uploadProductImage = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the product from the request params.
+    const { id } = req.params;
+
+    // Check if an image has been provided
+    if (!req.file) {
+      return res.status(400).json({ message: 'Please, provide an image.' });
+    }
+
+    // Get the category
+    const product = await prisma.productList.findUnique({ where: { id } });
+
+    // Check if the category exists
+    if (!product) {
+      return res.status(400).json({ message: 'The product does not exist.' });
+    }
+
+    // Check if the product has an image already and delete it.
+    if (product.image) {
+      const link = './public/productImages';
+
+      await deleteFile(link, product.image);
+    }
+
+    // Shrink the image and save it.
+    const buffer: Buffer = req.file?.buffer;
+    const imageName = generateRandomImageName();
+    Jimp.read(buffer, (err, lenna) => {
+      if (err) throw err;
+      lenna
+        .resize(256, 256)
+        .quality(60)
+        .greyscale()
+        .write(`public/productImages/${imageName}`);
+    });
+
+    // Update the product image in the database
+    await prisma.productList.update({
+      where: { id: product.id },
+      data: {
+        image: imageName,
+      },
+    });
+
+    // Send back a positive status code
+    res.status(201).json({ message: 'product image uploaded successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+const deleteProductImage = async (req: Request, res: Response) => {
+  try {
+    // Get the id of the product from the request params
+    const { id } = req.params;
+
+    // Delete the product
+    const product = await prisma.productList.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    // Check if the product exists
+    if (!product) {
+      return res.status(500).json({ message: 'product does not exist.' });
+    }
+
+    // Check if the product doesn't have an image
+    if (!product?.image) {
+      return res.status(500).json({ message: 'No image to be deleted.' });
+    }
+
+    // Delete the product image
+    const link = './public/productImages';
+    await deleteFile(link, product.image);
+
+    // Update the product image in the database
+    await prisma.productList.update({
+      where: { id: product.id },
+      data: {
+        image: null,
+      },
+    });
+
+    // Send back a positive response
+    res
+      .status(200)
+      .json({ message: 'product image has been deleted successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
 
 module.exports = {
   createSystemAdmin,
@@ -776,4 +995,11 @@ module.exports = {
   updateProduct,
   allPharmacies,
   deleteProduct,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  productCategoryImageUpload,
+  deleteCategoryImage,
+  uploadProductImage,
+  deleteProductImage,
 };
