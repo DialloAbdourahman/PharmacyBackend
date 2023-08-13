@@ -3,6 +3,8 @@ import { Prisma, PrismaClient } from '@prisma/client';
 const bcrypt = require('bcrypt');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
+import axios from 'axios';
+import { uuid } from 'uuidv4';
 const prisma: PrismaClient<
   Prisma.PrismaClientOptions,
   never,
@@ -427,6 +429,104 @@ const seeOrders = async (req: Request, res: Response) => {
   }
 };
 
+const momo = require('mtn-momo');
+const { Collections, Disbursements } = momo.create({
+  callbackHost: process.env.CALLBACK_HOST,
+});
+const collections = Collections({
+  userSecret: process.env.USER_SECRET, // X-Reference-Id aka password to get access token aka api key
+  userId: process.env.USER_ID, // Ocp-Apim-Subscription-Key aka username to get access token aka user id
+  primaryKey: process.env.PRIMARY_KEY,
+});
+const pay = async (req: Request, res: Response) => {
+  console.log('BEFORE TRANSACTION');
+
+  try {
+    const transactionId = await collections.requestToPay({
+      amount: '50',
+      currency: 'EUR',
+      externalId: '123456',
+      payer: {
+        partyIdType: 'MSISDN',
+        partyId: '256774290781',
+      },
+      payerMessage: 'testing',
+      payeeNote: 'hello',
+    });
+    const transactionDetails = await collections.getTransaction(transactionId);
+
+    console.log('Transaction ID: ', transactionId);
+    console.log('Transaction Details: ', transactionDetails);
+  } catch (error) {
+    console.log('Error', error);
+  }
+
+  console.log('AFTER TRANSACTION');
+};
+
+const rawPay = async (req: Request, res: Response) => {
+  try {
+    // Generate a new access token using the subscription key (Ocp-Apim-Subscription-Key), userid (initial uuid used to create the user and in our case it is the username) and the user secret (the api key and in our case, the password)
+    const {
+      data: { access_token },
+    } = await axios.post(
+      'https://sandbox.momodeveloper.mtn.com/collection/token/',
+      {},
+      {
+        headers: { 'Ocp-Apim-Subscription-Key': `${process.env.PRIMARY_KEY}` },
+        auth: {
+          username: `${process.env.USER_ID}`,
+          password: `${process.env.USER_SECRET}`,
+        },
+      }
+    );
+
+    // Request to pay using the access token and the subscription key
+    const transactionId = uuid();
+    await axios.post(
+      'https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay',
+      {
+        amount: '5000',
+        currency: 'EUR',
+        externalId: '4457114',
+        payer: {
+          partyIdType: 'MSISDN',
+          partyId: '677538950',
+        },
+        payerMessage: 'pay for product',
+        payeeNote: 'This is a note',
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          'X-Reference-Id': `${transactionId}`, // This represents the transaction id
+          'Ocp-Apim-Subscription-Key': `${process.env.PRIMARY_KEY}`,
+          'X-Target-Environment': 'sandbox',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    // Get the transaction information.
+    const transaction = await axios.get(
+      `https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay/${transactionId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          'Ocp-Apim-Subscription-Key': `${process.env.PRIMARY_KEY}`,
+          'X-Target-Environment': 'sandbox',
+        },
+      }
+    );
+
+    res.status(200).send('Success');
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).send(error);
+  }
+};
+
 module.exports = {
   createCustomer,
   loginCustomer,
@@ -436,4 +536,6 @@ module.exports = {
   placeOrder,
   updateAccount,
   seeOrders,
+  pay,
+  rawPay,
 };

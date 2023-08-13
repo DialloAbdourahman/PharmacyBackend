@@ -11,6 +11,8 @@ const {
   placeOrder,
   updateAccount,
   seeOrders,
+  pay,
+  rawPay,
 } = require('../controllers/customerController');
 
 // Addiional imports
@@ -22,6 +24,8 @@ router.post('/reserve', auth, reserveProduct);
 router.post('/placeOrder', auth, placeOrder);
 router.post('/logout', auth, logoutCustomer);
 router.post('/token', refreshToken);
+router.post('/pay', pay);
+router.post('/rawPay', rawPay);
 router.post('/', createCustomer);
 
 // READ ROUTES

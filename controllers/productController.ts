@@ -59,4 +59,34 @@ const getProducts = async (req: Request, res: Response) => {
   }
 };
 
-module.exports = { getProducts };
+const searchProduct = async (req: Request, res: Response) => {
+  try {
+    // Get the search criteria from request query.
+    let name: string = String(req.query.name);
+
+    // Get the products from db.
+    const products = await prisma.productList.findMany({
+      take: 5,
+      where: {
+        name: {
+          contains: name,
+          mode: 'insensitive',
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+
+    // Send back a positive response.
+    res.status(200).json(products);
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong.', error });
+  }
+};
+
+module.exports = { getProducts, searchProduct };

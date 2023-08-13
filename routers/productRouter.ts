@@ -2,11 +2,15 @@ import express from 'express';
 const router = express.Router();
 
 // Importing controllers
-const { getProducts } = require('../controllers/productController');
+const {
+  getProducts,
+  searchProduct,
+} = require('../controllers/productController');
 
 // CREATE ROUTES
 
 // READ ROUTES
+router.get('/search', searchProduct);
 router.get('/', getProducts);
 
 // UPDATE ROUTES
