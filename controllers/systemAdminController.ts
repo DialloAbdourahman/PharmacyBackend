@@ -117,13 +117,13 @@ const loginSystemAdmin = async (req: Request, res: Response) => {
 
     // Generate access token
     let dataToGenerateAuthToken: any = { ...systemAdmin, password: undefined };
-    const accessToken = await generateAccessToken(
+    const accessToken = generateAccessToken(
       dataToGenerateAuthToken,
       process.env.JWT_ACCESS_TOKEN_SECRET_SYSTEM_ADMIN
     );
 
     // Generate refresh token and store it in database.
-    const refreshToken = await generateRefreshToken(
+    const refreshToken = generateRefreshToken(
       dataToGenerateAuthToken,
       process.env.JWT_REFRESH_TOKEN_SECRET_SYSTEM_ADMIN
     );
@@ -209,7 +209,7 @@ const refreshToken = async (req: Request, res: Response) => {
     }
 
     // Generate a new access token
-    const accessToken = await generateAccessToken(
+    const accessToken = generateAccessToken(
       systemAdmin,
       process.env.JWT_ACCESS_TOKEN_SECRET_SYSTEM_ADMIN
     );

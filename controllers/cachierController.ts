@@ -56,13 +56,13 @@ const loginCachier = async (req: Request, res: Response) => {
 
     // Generate access token
     let dataToGenerateAuthToken: any = { ...cachier, password: undefined };
-    const accessToken = await generateAccessToken(
+    const accessToken = generateAccessToken(
       dataToGenerateAuthToken,
       process.env.JWT_ACCESS_TOKEN_SECRET_CACHIER
     );
 
     // Generate refresh token and store it in database.
-    const refreshToken = await generateRefreshToken(
+    const refreshToken = generateRefreshToken(
       dataToGenerateAuthToken,
       process.env.JWT_REFRESH_TOKEN_SECRET_CACHIER
     );
@@ -130,7 +130,7 @@ const refreshToken = async (req: Request, res: Response) => {
     }
 
     // Generate a new access token
-    const accessToken = await generateAccessToken(
+    const accessToken = generateAccessToken(
       cachier,
       process.env.JWT_ACCESS_TOKEN_SECRET_CACHIER
     );
