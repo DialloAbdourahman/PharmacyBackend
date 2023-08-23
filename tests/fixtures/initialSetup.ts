@@ -35,6 +35,7 @@ const systemAdmin = {
   id: '1234',
   name: 'Diallo Abdourahman',
   email: 'dialliabdourahman78@gmail.com',
+  password: 'diallo1234',
   creator: null,
 };
 let systemAdminRefreshToken = generateRefreshToken(
@@ -75,6 +76,7 @@ const pharmacyAdmin = {
   id: '1234',
   name: 'Eren Yager',
   email: 'eren@gmail.com',
+  password: 'eren1234',
 };
 let pharmacyAdminRefreshToken = generateRefreshToken(
   {
@@ -103,6 +105,7 @@ const cachier = {
   email: 'armin@gmail.com',
   creator: pharmacyAdmin.id,
   associatedPharmacy: pharmacy.id,
+  password: 'armin1234',
 };
 let cachierRefreshToken = generateRefreshToken(
   {
@@ -129,6 +132,7 @@ const customer = {
   id: '1234',
   name: 'Mikassa Akerman',
   email: 'mikassa@gmail.com',
+  password: 'mikassa1234',
 };
 let customerRefreshToken = generateRefreshToken(
   {
@@ -249,7 +253,7 @@ const setupDatabase = async () => {
   await prisma.systemAdmin.create({
     data: {
       ...systemAdmin,
-      password: await bcrypt.hash('diallo1234', 8),
+      password: await bcrypt.hash(systemAdmin.password, 8),
       refreshToken: systemAdminRefreshToken,
     },
   });
@@ -263,7 +267,7 @@ const setupDatabase = async () => {
           id: pharmacyAdmin.id,
           name: pharmacyAdmin.name,
           email: pharmacyAdmin.email,
-          password: await bcrypt.hash('eren1234', 8),
+          password: await bcrypt.hash(pharmacyAdmin.password, 8),
           creator: systemAdmin.id,
           refreshToken: pharmacyAdminRefreshToken,
         },
@@ -275,7 +279,7 @@ const setupDatabase = async () => {
   await prisma.cachier.create({
     data: {
       ...cachier,
-      password: await bcrypt.hash('armin1234', 8),
+      password: await bcrypt.hash(cachier.password, 8),
       refreshToken: cachierRefreshToken,
     },
   });
@@ -284,7 +288,7 @@ const setupDatabase = async () => {
   await prisma.customer.create({
     data: {
       ...customer,
-      password: await bcrypt.hash('mikassa1234', 8),
+      password: await bcrypt.hash(customer.password, 8),
       refreshToken: customerRefreshToken,
     },
   });
