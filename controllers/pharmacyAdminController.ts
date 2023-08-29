@@ -211,7 +211,7 @@ const updateInformation = async (req: Request, res: Response) => {
 
     // Send back a positive response
     res
-      .status(201)
+      .status(200)
       .json({ message: 'Your credentials have been updated successfully.' });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });

@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Order" ALTER COLUMN "productId" DROP NOT NULL,
+ALTER COLUMN "customerId" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "Sale" ALTER COLUMN "productId" DROP NOT NULL,
+ALTER COLUMN "cachierId" DROP NOT NULL;

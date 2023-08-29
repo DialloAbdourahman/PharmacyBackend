@@ -1,6 +1,5 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const prisma: PrismaClient<
   Prisma.PrismaClientOptions,
   never,
@@ -203,12 +202,14 @@ const productTwo = {
 const orderOne = {
   id: '1234',
   quantity: 3,
+  price: productOne.price,
   fulfilled: true,
   productId: productOne.id,
   customerId: customer.id,
 };
 const orderTwo = {
   id: '5678',
+  price: productTwo.price,
   quantity: 3,
   fulfilled: true,
   productId: productTwo.id,
@@ -218,12 +219,14 @@ const orderTwo = {
 const saleOne = {
   id: '1234',
   quantity: 1,
+  price: productOne.price,
   productId: productOne.id,
   cachierId: cachier.id,
 };
 const saleTwo = {
   id: '5678',
   quantity: 3,
+  price: productTwo.price,
   productId: productTwo.id,
   cachierId: cachier.id,
 };
@@ -329,4 +332,7 @@ module.exports = {
   cachierRefreshToken,
   customerAccessToken,
   customerRefreshToken,
+  categoryAntibiotic,
+  productOne,
+  productListPenicillin,
 };

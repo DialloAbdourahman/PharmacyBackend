@@ -253,7 +253,7 @@ const placeOrder = async (req: Request, res: Response) => {
     // Calculate the total amount.
     let totalAmount = 0;
     await Promise.all(
-      cart.map(async ({ productId, quantity }: any) => {
+      cart.map(async ({ productId, quantity }: any, i: number) => {
         // Get the product
         const product: any = await prisma.product.findUnique({
           where: { id: productId },
@@ -277,6 +277,7 @@ const placeOrder = async (req: Request, res: Response) => {
           return;
         }
 
+        cart[i].price = product.price;
         totalAmount += product.price * quantity;
       })
     );
@@ -285,11 +286,12 @@ const placeOrder = async (req: Request, res: Response) => {
 
     // Store that data in db, create a reciept and udpate product's amount.
     let orderList = await Promise.all(
-      cart.map(async ({ productId, quantity }: any) => {
+      cart.map(async ({ productId, quantity, price }: any) => {
         const singleOrder = await prisma.order.create({
           data: {
             productId,
             quantity,
+            price,
             customerId: req.user.id,
           },
           select: {

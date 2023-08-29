@@ -27,11 +27,11 @@ const { seeProducts } = require('../controllers/systemAdminController');
 const { authPharmacyAdmin: auth } = require('../middlewares/auth');
 
 // CREATE ROUTES
-router.post('/login', loginPharmacyAdmin);
-router.post('/token', refreshToken);
-router.post('/logout', auth, logout);
-router.post('/createPharmacyAdmin', auth, createPharmacyAdmin);
-router.post('/createCachier', auth, createCachier);
+router.post('/login', loginPharmacyAdmin); // Tested.
+router.post('/token', refreshToken); // Tested.
+router.post('/logout', auth, logout); // Tested.
+router.post('/createPharmacyAdmin', auth, createPharmacyAdmin); // Tested.
+router.post('/createCachier', auth, createCachier); // Tested.
 router.post('/createProduct', auth, createProduct);
 
 // READ ROUTES

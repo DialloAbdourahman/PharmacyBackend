@@ -142,24 +142,26 @@ model Product {
 model Order {
   id        String   @id @default(uuid())
   quantity  Int
+  price     Float
   date      DateTime @default(now())
   fulfilled Boolean  @default(false)
 
-  orderedProduct   Product  @relation(fields: [productId], references: [id])
-  productId        String
-  customerOrdering Customer @relation(fields: [customerId], references: [id])
-  customerId       String
+  orderedProduct   Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId        String?
+  customerOrdering Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  customerId       String?
 }
 
 model Sale {
   id       String   @id @default(uuid())
   quantity Int
+  price    Float
   date     DateTime @default(now())
 
-  soldProduct    Product @relation(fields: [productId], references: [id])
-  productId      String
-  cachierSelling Cachier @relation(fields: [cachierId], references: [id])
-  cachierId      String
+  soldProduct    Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+  productId      String?
+  cachierSelling Cachier? @relation(fields: [cachierId], references: [id], onDelete: SetNull)
+  cachierId      String?
 }
 
 model Complain {

@@ -254,7 +254,7 @@ const sellProducts = async (req: Request, res: Response) => {
     // Calculate the total amount.
     let totalAmount = 0;
     await Promise.all(
-      products.map(async ({ productId, quantity }: any) => {
+      products.map(async ({ productId, quantity }: any, i: number) => {
         // Get the product
         const product: any = await prisma.product.findUnique({
           where: { id: productId },
@@ -273,17 +273,19 @@ const sellProducts = async (req: Request, res: Response) => {
           return;
         }
 
+        products[i].price = product.price;
         totalAmount += product.price * quantity;
       })
     );
 
     // Store that data in db, create a reciept and udpate product's amount.
     let saleList = await Promise.all(
-      products.map(async ({ productId, quantity }: any) => {
+      products.map(async ({ productId, quantity, price }: any) => {
         const singleSale = await prisma.sale.create({
           data: {
             productId,
             quantity,
+            price,
             cachierId: req.user.id,
           },
           select: {

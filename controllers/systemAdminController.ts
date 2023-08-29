@@ -268,7 +268,7 @@ const updateSystemAdmin = async (req: Request, res: Response) => {
 
     // Send back a positive response
     res
-      .status(201)
+      .status(200)
       .json({ message: 'Your credentials have been updated successfully.' });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
@@ -486,7 +486,7 @@ const updatePharmacy = async (req: Request, res: Response) => {
     });
 
     // Send back a positive response
-    res.status(201).json({
+    res.status(200).json({
       message: "Phamacy's credentials have been updated successfully.",
     });
   } catch (error) {
@@ -616,7 +616,7 @@ const updateProduct = async (req: Request, res: Response) => {
     });
 
     // Send back a positive response
-    res.status(201).json({
+    res.status(200).json({
       message: 'Product has been updated successfully.',
     });
   } catch (error) {

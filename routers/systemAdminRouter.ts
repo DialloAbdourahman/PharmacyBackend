@@ -36,12 +36,12 @@ const upload = multer({ storage: storage });
 const { authSystemAdmin: auth } = require('../middlewares/auth');
 
 // CREATE ROUTES
-router.post('/login', loginSystemAdmin);
-router.post('/token', refreshToken);
-router.post('/logout', auth, logout);
-router.post('/createPharmacy', auth, createPharmacy);
-router.post('/createProduct', auth, createProduct);
-router.post('/createProductCategory', auth, createCategory);
+router.post('/login', loginSystemAdmin); // Tested.
+router.post('/token', refreshToken); // Tested.
+router.post('/logout', auth, logout); // Tested.
+router.post('/createPharmacy', auth, createPharmacy); // Tested.
+router.post('/createProduct', auth, createProduct); // Tested.
+router.post('/createProductCategory', auth, createCategory); // Tested.
 router.post(
   '/uploadProductCategoryImage/:id',
   auth,
@@ -50,7 +50,7 @@ router.post(
   (error: any, req: Request, res: Response, next: NextFunction) => {
     res.status(400).json({ message: error.message });
   }
-);
+); // Tested.
 router.post(
   '/uploadProductImage/:id',
   auth,
@@ -59,26 +59,26 @@ router.post(
   (error: any, req: Request, res: Response, next: NextFunction) => {
     res.status(400).json({ message: error.message });
   }
-);
-router.post('/', auth, createSystemAdmin);
+); // Tested.
+router.post('/', auth, createSystemAdmin); // Tested.
 
 // READ ROUTES
-router.get('/seeProducts', auth, seeProducts);
-router.get('/seeProduct/:id', auth, seeProduct);
-router.get('/allPharmacies', auth, allPharmacies);
-router.get('/', auth, allSystemAdmins);
+router.get('/seeProducts', auth, seeProducts); // Tested.
+router.get('/seeProduct/:id', auth, seeProduct); // Tested.
+router.get('/allPharmacies', auth, allPharmacies); // Tested.
+router.get('/', auth, allSystemAdmins); // Tested
 
 // UPDATE ROUTES
-router.put('/updatePharmacy/:id', auth, updatePharmacy);
-router.put('/updateProduct/:id', auth, updateProduct);
-router.put('/updateProductCategory/:id', auth, updateCategory);
-router.put('/', auth, updateSystemAdmin);
+router.put('/updatePharmacy/:id', auth, updatePharmacy); // Tested.
+router.put('/updateProduct/:id', auth, updateProduct); // Tested.
+router.put('/updateProductCategory/:id', auth, updateCategory); // Tested.
+router.put('/', auth, updateSystemAdmin); // Tested.
 
 // DELETE ROUTES
-router.delete('/deletePharmacy/:id', auth, deletePharmacy);
-router.delete('/deleteProduct/:id', auth, deleteProduct);
-router.delete('/deleteProductCategory/:id', auth, deleteCategory);
-router.delete('/deleteCategoryImage/:id', auth, deleteCategoryImage);
-router.delete('/deleteProductImage/:id', auth, deleteProductImage);
+router.delete('/deletePharmacy/:id', auth, deletePharmacy); // Tested.
+router.delete('/deleteProduct/:id', auth, deleteProduct); // Tested.
+router.delete('/deleteProductCategory/:id', auth, deleteCategory); // Tested.
+router.delete('/deleteCategoryImage/:id', auth, deleteCategoryImage); // Tested.
+router.delete('/deleteProductImage/:id', auth, deleteProductImage); // Tested
 
 module.exports = router;
