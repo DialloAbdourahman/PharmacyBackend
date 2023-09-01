@@ -125,10 +125,9 @@ model ProductList {
 }
 
 model Product {
-  id       String  @id @default(uuid())
-  price    Float
-  amount   Int     @default(0)
-  reserved Boolean @default(false)
+  id     String @id @default(uuid())
+  price  Float
+  amount Int    @default(0)
 
   productList     ProductList @relation(fields: [product], references: [id], onDelete: Cascade)
   product         String

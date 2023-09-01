@@ -185,7 +185,6 @@ const productOne = {
   id: '1234',
   price: 1000,
   amount: 5,
-  reserved: true,
   product: productListDoliprane.id,
   pharmacySelling: pharmacy.id,
 };
@@ -194,7 +193,6 @@ const productTwo = {
   id: '5678',
   price: 1600,
   amount: 50,
-  reserved: true,
   product: productListPenicillin.id,
   pharmacySelling: pharmacy.id,
 };
@@ -223,6 +221,7 @@ const saleOne = {
   productId: productOne.id,
   cachierId: cachier.id,
 };
+
 const saleTwo = {
   id: '5678',
   quantity: 3,
@@ -334,5 +333,9 @@ module.exports = {
   customerRefreshToken,
   categoryAntibiotic,
   productOne,
+  productTwo,
   productListPenicillin,
+  productListDoliprane,
+  orderOne,
+  saleOne,
 };

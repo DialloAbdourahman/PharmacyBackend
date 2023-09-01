@@ -360,6 +360,7 @@ const seeAllPharmacyAdmins = async (req: Request, res: Response) => {
     // Get all the pharmacy admins
     const pharmacyAdmins = await prisma.pharmacyAdmin.findMany({
       select: {
+        id: true,
         name: true,
         email: true,
         titleName: true,
@@ -463,7 +464,7 @@ const createProduct = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(200).json({ message: 'Product created successfully.' });
+    return res.status(201).json({ message: 'Product created successfully.' });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
@@ -481,7 +482,7 @@ const updateProduct = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Please provide data to us.' });
     }
 
-    const allowedEntery = ['price', 'amount', 'reserved'];
+    const allowedEntery = ['price', 'amount'];
 
     // Check if the enteries are valid
     const isValidOperation = enteries.every((entery) => {
@@ -589,6 +590,9 @@ const seeOneOFOurProduct = async (req: Request, res: Response) => {
       where: {
         id,
         pharmacySelling: req.user.associatedPharmacy,
+      },
+      include: {
+        productList: true,
       },
     });
 

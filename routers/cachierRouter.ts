@@ -7,7 +7,6 @@ const {
   refreshToken,
   logout,
   updateCredentiatls,
-  deleteAccount,
   sellProducts,
 } = require('../controllers/cachierController');
 const {
@@ -34,6 +33,5 @@ router.get('/seeAllSales', auth, seeAllSales);
 router.put('/', auth, updateCredentiatls);
 
 // DELETE ROUTES
-router.delete('/', auth, deleteAccount);
 
 module.exports = router;

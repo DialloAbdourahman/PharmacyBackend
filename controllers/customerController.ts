@@ -217,15 +217,6 @@ const refreshToken = async (req: Request, res: Response) => {
   }
 };
 
-const reserveProduct = async (req: Request, res: Response) => {
-  try {
-    console.log('Allowed');
-    console.log(req.user);
-  } catch (error) {
-    return res.status(500).json({ message: 'Something went wrong.', error });
-  }
-};
-
 const placeOrder = async (req: Request, res: Response) => {
   try {
     // Get the list of products from the request body. cart=[{productId:"1234", quantity:2}]
@@ -532,7 +523,6 @@ const rawPay = async (req: Request, res: Response) => {
 module.exports = {
   createCustomer,
   loginCustomer,
-  reserveProduct,
   logoutCustomer,
   refreshToken,
   placeOrder,

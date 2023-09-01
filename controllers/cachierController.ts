@@ -208,20 +208,8 @@ const updateCredentiatls = async (req: Request, res: Response) => {
 
     // Send back a positive response
     res
-      .status(201)
+      .status(200)
       .json({ message: 'Your credentials have been updated successfully.' });
-  } catch (error) {
-    return res.status(500).json({ message: 'Something went wrong.', error });
-  }
-};
-
-const deleteAccount = async (req: Request, res: Response) => {
-  try {
-    // Delete the cachier
-    await prisma.cachier.delete({ where: { id: req.user.id } });
-
-    // Send back a positive response
-    res.status(200).json({ message: 'Account has been deleted successfully.' });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
@@ -332,6 +320,13 @@ const sellProducts = async (req: Request, res: Response) => {
       })
     );
 
+    // Check if the data has been verified well
+    if (saleList.length < 1) {
+      return res
+        .status(400)
+        .json({ message: 'Bad sale, please enter all data well.' });
+    }
+
     // Send back a positive response.
     res.status(201).json({ message: 'Sale completed.', saleList, totalAmount });
   } catch (error) {
@@ -344,6 +339,5 @@ module.exports = {
   refreshToken,
   logout,
   updateCredentiatls,
-  deleteAccount,
   sellProducts,
 };
