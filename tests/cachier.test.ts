@@ -287,9 +287,11 @@ test('Should allow a cachier to sell products.', async () => {
   });
   expect(sales[0].cachierId).toBe(cachier.id);
   expect(sales[0].productId).toBe(productOne.id);
+  expect(sales[0].price).toBe(productOne.price);
   expect(sales[0].quantity).toBe(4);
   expect(sales[1].cachierId).toBe(cachier.id);
   expect(sales[1].productId).toBe(productTwo.id);
+  expect(sales[1].price).toBe(productTwo.price);
   expect(sales[1].quantity).toBe(49);
 
   // Assert that the products amount has been decremented.
@@ -332,6 +334,7 @@ test('Should not allow a cachier to sell products with a small quantity (comprom
   expect(sales.length).toBe(1);
   expect(sales[0].cachierId).toBe(cachier.id);
   expect(sales[0].productId).toBe(productOne.id);
+  expect(sales[0].price).toBe(productOne.price);
   expect(sales[0].quantity).toBe(5);
 
   // Assert that the products amount has been decremented.
