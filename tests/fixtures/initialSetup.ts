@@ -338,4 +338,5 @@ module.exports = {
   productListDoliprane,
   orderOne,
   saleOne,
+  categoryPrescription,
 };

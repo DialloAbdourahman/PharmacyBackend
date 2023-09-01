@@ -9,7 +9,11 @@ const prisma: PrismaClient<
 const seeCategories = async (req: Request, res: Response) => {
   try {
     // Get all the categories from db.
-    const categories = await prisma.productCategory.findMany({});
+    const categories = await prisma.productCategory.findMany({
+      orderBy: {
+        name: 'asc',
+      },
+    });
 
     // Map the correct url
     let categoriesWithImagesUrl = categories.map((category) => {
