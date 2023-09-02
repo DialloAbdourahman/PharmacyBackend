@@ -55,7 +55,7 @@ const getProducts = async (req: Request, res: Response) => {
     // Send back a positive response.
     res.status(200).json(productsWithCorrectImageUrl);
   } catch (error) {
-    res.status(401).json({ message: 'Something went wrong.', error });
+    res.status(500).json({ message: 'Something went wrong.', error });
   }
 };
 

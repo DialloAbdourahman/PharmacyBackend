@@ -19,10 +19,10 @@ const { authCustomer: auth } = require('../middlewares/auth');
 
 // CREATE ROUTES
 router.post('/login', loginCustomer); // Tested.
-router.post('/placeOrder', auth, placeOrder);
+router.post('/placeOrder', auth, placeOrder); // Tested.
 router.post('/logout', auth, logoutCustomer); // Tested.
 router.post('/token', refreshToken); // Tested.
-router.post('/', createCustomer);
+router.post('/', createCustomer); // Tested.
 
 // READ ROUTES
 router.get('/orders', auth, seeOrders); // Tested.

@@ -5,6 +5,6 @@ const router = express.Router();
 const { seeCategories } = require('../controllers/categoryController');
 
 // READ ROUTES
-router.get('/', seeCategories);
+router.get('/', seeCategories); // Tested.
 
 module.exports = router;

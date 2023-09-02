@@ -10,8 +10,8 @@ const {
 // CREATE ROUTES
 
 // READ ROUTES
-router.get('/', seeAllPharmacies);
-router.get('/:id', seePharmacy);
+router.get('/', seeAllPharmacies); // Tested.
+router.get('/:id', seePharmacy); // Tested.
 
 // UPDATE ROUTES
 

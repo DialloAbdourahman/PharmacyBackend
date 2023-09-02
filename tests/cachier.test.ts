@@ -20,6 +20,7 @@ const {
   saleOne,
   cachierAccessToken,
   cachierRefreshToken,
+  pharmacy,
 } = require('./fixtures/initialSetup');
 
 beforeEach(setupDatabase);
@@ -339,6 +340,9 @@ test('Should not allow a cachier to sell products with non matching quantity (co
 
   // Assert that the products amount has been decremented.
   const soldProducts = await prisma.product.findMany({
+    where: {
+      pharmacySelling: pharmacy.id,
+    },
     orderBy: {
       amount: 'asc',
     },
@@ -374,6 +378,9 @@ test('Should not allow a cachier to sell products with non matching quantity (ve
 
   // Assert that the products amount has not been decremented.
   const soldProducts = await prisma.product.findMany({
+    where: {
+      pharmacySelling: pharmacy.id,
+    },
     orderBy: {
       amount: 'asc',
     },
@@ -410,6 +417,9 @@ test('Should not allow a non cachier to sell products.', async () => {
 
   // Assert that the products amount has been decremented.
   const soldProducts = await prisma.product.findMany({
+    where: {
+      pharmacySelling: pharmacy.id,
+    },
     orderBy: {
       amount: 'asc',
     },
@@ -445,6 +455,9 @@ test('Should not allow an unauthenticated user to sell products.', async () => {
 
   // Assert that the products amount has been decremented.
   const soldProducts = await prisma.product.findMany({
+    where: {
+      pharmacySelling: pharmacy.id,
+    },
     orderBy: {
       amount: 'asc',
     },

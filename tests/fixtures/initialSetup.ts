@@ -67,8 +67,8 @@ const pharmacy = {
   hourly: '8:00 - 18:00',
   allNight: true,
   creator: systemAdmin.id,
-  latitude: 3.872225,
-  longitude: 11.504342,
+  latitude: 3.872237,
+  longitude: 11.504338,
 };
 
 const pharmacyAdmin = {
@@ -94,6 +94,46 @@ let pharmacyAdminAccessToken = generateAccessToken(
     email: pharmacyAdmin.email,
     titleName: pharmacyAdminRole.name,
     associatedPharmacy: pharmacy.id,
+  },
+  process.env.JWT_ACCESS_TOKEN_SECRET_PHARMACY_ADMIN
+);
+
+const pharmacyTwo = {
+  id: '5678',
+  name: 'Pharmacy de Nkolbisson',
+  email: 'pharmacydenkolbisson@gmmail.com',
+  phoneNumber: '656760726',
+  address: 'Nkolbisson yaounde',
+  hourly: '8:00 - 18:00',
+  allNight: true,
+  creator: systemAdmin.id,
+  latitude: 3.872836,
+  longitude: 11.455132,
+};
+
+const pharmacyAdminTwo = {
+  id: '5678',
+  name: 'Erwin Smith',
+  email: 'erwin@gmail.com',
+  password: 'erwin1234',
+};
+let pharmacyAdminTwoRefreshToken = generateRefreshToken(
+  {
+    id: pharmacyAdminTwo.id,
+    name: pharmacyAdminTwo.name,
+    email: pharmacyAdminTwo.email,
+    titleName: pharmacyAdminRole.name,
+    associatedPharmacy: pharmacyTwo.id,
+  },
+  process.env.JWT_REFRESH_TOKEN_SECRET_PHARMACY_ADMIN
+);
+let pharmacyAdminTwoAccessToken = generateAccessToken(
+  {
+    id: pharmacyAdminTwo.id,
+    name: pharmacyAdminTwo.name,
+    email: pharmacyAdminTwo.email,
+    titleName: pharmacyAdminRole.name,
+    associatedPharmacy: pharmacyTwo.id,
   },
   process.env.JWT_ACCESS_TOKEN_SECRET_PHARMACY_ADMIN
 );
@@ -197,6 +237,22 @@ const productTwo = {
   pharmacySelling: pharmacy.id,
 };
 
+const productThree = {
+  id: '9101',
+  price: 1000,
+  amount: 50,
+  product: productListDoliprane.id,
+  pharmacySelling: pharmacyTwo.id,
+};
+
+const productFour = {
+  id: '1123',
+  price: 1700,
+  amount: 5,
+  product: productListPenicillin.id,
+  pharmacySelling: pharmacyTwo.id,
+};
+
 const orderOne = {
   id: '1234',
   quantity: 3,
@@ -276,6 +332,22 @@ const setupDatabase = async () => {
       },
     },
   });
+  await prisma.pharmacy.create({
+    data: {
+      ...pharmacyTwo,
+
+      pharmacyAdmin: {
+        create: {
+          id: pharmacyAdminTwo.id,
+          name: pharmacyAdminTwo.name,
+          email: pharmacyAdminTwo.email,
+          password: await bcrypt.hash(pharmacyAdminTwo.password, 8),
+          creator: systemAdmin.id,
+          refreshToken: pharmacyAdminTwoRefreshToken,
+        },
+      },
+    },
+  });
 
   // Cashier
   await prisma.cachier.create({
@@ -306,6 +378,8 @@ const setupDatabase = async () => {
   // Product
   await prisma.product.create({ data: productOne });
   await prisma.product.create({ data: productTwo });
+  await prisma.product.create({ data: productThree });
+  await prisma.product.create({ data: productFour });
 
   // Order
   await prisma.order.create({ data: orderOne });
@@ -340,4 +414,8 @@ module.exports = {
   orderTwo,
   saleOne,
   categoryPrescription,
+  pharmacyTwo,
+  pharmacyAdminTwo,
+  productThree,
+  productFour,
 };

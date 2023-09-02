@@ -6,26 +6,11 @@ const prisma: PrismaClient<
 > = require('../utils/prismaClient');
 const app = require('../src/app');
 const request = require('supertest');
-const {
-  setupDatabase,
-  systemAdminAccessToken,
-  systemAdminRefreshToken,
-  pharmacyAdminAccessToken,
-  productOne,
-  productTwo,
-  productListPenicillin,
-  cachier,
-  customer,
-  orderOne,
-  saleOne,
-  cachierAccessToken,
-  cachierRefreshToken,
-  pharmacy,
-} = require('./fixtures/initialSetup');
+const { setupDatabase, pharmacy } = require('./fixtures/initialSetup');
 
 beforeEach(setupDatabase);
 
-test('should allow any user to see one all the pharmacies', async () => {
+test('should allow any user to see all the pharmacies', async () => {
   // Assert that a 200 status code is returned.
   const response = await request(app)
     .get('/api/pharmacy?name=messa&page=1')

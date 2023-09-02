@@ -18,6 +18,7 @@ const {
   orderTwo,
   customerAccessToken,
   customerRefreshToken,
+  pharmacy,
 } = require('./fixtures/initialSetup');
 
 beforeEach(setupDatabase);
@@ -279,6 +280,9 @@ test('Should not allow a customer to order products with non quantity (compromiz
 
   // Assert that the products amount has been decremented.
   const soldProducts = await prisma.product.findMany({
+    where: {
+      pharmacySelling: pharmacy.id,
+    },
     orderBy: {
       amount: 'asc',
     },
@@ -314,6 +318,9 @@ test('Should not allow a customer to order products with non matching quantity (
 
   // Assert that the products amount has not been decremented.
   const soldProducts = await prisma.product.findMany({
+    where: {
+      pharmacySelling: pharmacy.id,
+    },
     orderBy: {
       amount: 'asc',
     },
@@ -350,6 +357,9 @@ test('Should not allow a non customer to order products.', async () => {
 
   // Assert that the products amount has been decremented.
   const soldProducts = await prisma.product.findMany({
+    where: {
+      pharmacySelling: pharmacy.id,
+    },
     orderBy: {
       amount: 'asc',
     },
@@ -385,10 +395,30 @@ test('Should not allow an unauthenticated user to place orders.', async () => {
 
   // Assert that the products amount has been decremented.
   const soldProducts = await prisma.product.findMany({
+    where: {
+      pharmacySelling: pharmacy.id,
+    },
     orderBy: {
       amount: 'asc',
     },
   });
   expect(soldProducts[0].amount).toBe(5);
   expect(soldProducts[1].amount).toBe(50);
+});
+
+test('Should allow a customer to create his account.', async () => {
+  // Assert that a 201 status code is returned.
+  const response = await request(app).post(`/api/customer`).send({
+    name: 'test',
+    email: 'test@gmail.com',
+    password: 'test1234',
+  });
+  expect(response.status).toBe(201);
+
+  // Assert that the customer has been created successfully.
+  const createdCustomer = await prisma.customer.findUnique({
+    where: { email: 'test@gmail.com' },
+  });
+  expect(createdCustomer).not.toBe(null);
+  expect(createdCustomer?.name).toBe('test');
 });

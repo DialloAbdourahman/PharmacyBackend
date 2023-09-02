@@ -10,8 +10,8 @@ const {
 // CREATE ROUTES
 
 // READ ROUTES
-router.get('/search', searchProduct);
-router.get('/', getProducts);
+router.get('/search', searchProduct); // Tested.
+router.get('/', getProducts); // Tested.
 
 // UPDATE ROUTES
 
