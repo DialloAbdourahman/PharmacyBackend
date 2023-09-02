@@ -273,7 +273,7 @@ const placeOrder = async (req: Request, res: Response) => {
       })
     );
 
-    // Do all the payment stuff here
+    // Do all the payment stuff here aka maybe generate payment link and send to the user.
 
     // Store that data in db, create a reciept and udpate product's amount.
     let orderList = await Promise.all(
@@ -329,6 +329,13 @@ const placeOrder = async (req: Request, res: Response) => {
       })
     );
 
+    // Check if the data has been verified well
+    if (orderList.length < 1) {
+      return res
+        .status(400)
+        .json({ message: 'Bad sale, please enter all data well.' });
+    }
+
     // Send back a positive response.
     res
       .status(201)
@@ -380,7 +387,7 @@ const updateAccount = async (req: Request, res: Response) => {
 
     // Send back a positive response
     res
-      .status(201)
+      .status(200)
       .json({ message: 'Your credentials have been updated successfully.' });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
@@ -401,6 +408,7 @@ const seeOrders = async (req: Request, res: Response) => {
         date: true,
         orderedProduct: {
           select: {
+            id: true,
             price: true,
             productList: {
               select: {

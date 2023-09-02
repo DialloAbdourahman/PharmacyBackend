@@ -337,6 +337,7 @@ module.exports = {
   productListPenicillin,
   productListDoliprane,
   orderOne,
+  orderTwo,
   saleOne,
   categoryPrescription,
 };

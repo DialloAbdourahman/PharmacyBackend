@@ -18,17 +18,17 @@ const {
 const { authCustomer: auth } = require('../middlewares/auth');
 
 // CREATE ROUTES
-router.post('/login', loginCustomer);
+router.post('/login', loginCustomer); // Tested.
 router.post('/placeOrder', auth, placeOrder);
-router.post('/logout', auth, logoutCustomer);
-router.post('/token', refreshToken);
+router.post('/logout', auth, logoutCustomer); // Tested.
+router.post('/token', refreshToken); // Tested.
 router.post('/', createCustomer);
 
 // READ ROUTES
-router.get('/orders', auth, seeOrders);
+router.get('/orders', auth, seeOrders); // Tested.
 
 // UPDATE ROUTES
-router.put('/', auth, updateAccount);
+router.put('/', auth, updateAccount); // Tested.
 
 // DELETE ROUTES
 

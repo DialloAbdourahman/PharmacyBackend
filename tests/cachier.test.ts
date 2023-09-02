@@ -304,7 +304,7 @@ test('Should allow a cachier to sell products.', async () => {
   expect(soldProducts[1].amount).toBe(1);
 });
 
-test('Should not allow a cachier to sell products with a small quantity (compromized amount).', async () => {
+test('Should not allow a cachier to sell products with non matching quantity (compromized amount).', async () => {
   // Setup db
   await prisma.sale.deleteMany({});
 
@@ -346,7 +346,7 @@ test('Should not allow a cachier to sell products with a small quantity (comprom
   expect(soldProducts[0].amount).toBe(0);
 });
 
-test('Should not allow a cachier to sell products with a small quantity (very compromized amount).', async () => {
+test('Should not allow a cachier to sell products with non matching quantity (very compromized amount).', async () => {
   // Setup db
   await prisma.sale.deleteMany({});
 
