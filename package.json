@@ -6,7 +6,8 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
-    "test": "jest --watchAll --runInBand"
+    "test": "jest --watchAll --runInBand",
+    "initialize": "ts-node src/initialize.ts"
   },
   "author": "",
   "license": "ISC",
