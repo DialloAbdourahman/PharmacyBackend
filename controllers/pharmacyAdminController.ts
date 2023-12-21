@@ -42,6 +42,8 @@ const loginPharmacyAdmin = async (req: Request, res: Response) => {
         titleName: true,
         password: true,
         associatedPharmacy: true,
+        phoneNumber: true,
+        address: true,
       },
     });
     if (!pharmacyAdmin) {
@@ -123,6 +125,8 @@ const refreshToken = async (req: Request, res: Response) => {
         email: true,
         titleName: true,
         associatedPharmacy: true,
+        phoneNumber: true,
+        address: true,
       },
     });
 

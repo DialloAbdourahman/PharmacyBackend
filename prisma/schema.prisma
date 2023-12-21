@@ -12,6 +12,8 @@ model SystemAdmin {
   name         String
   email        String  @unique
   password     String
+  address      String?
+  phoneNumber  String?
   refreshToken String?
 
   title              UserType     @relation(fields: [titleName], references: [name])
@@ -28,6 +30,8 @@ model PharmacyAdmin {
   name         String
   email        String  @unique
   password     String
+  address      String?
+  phoneNumber  String?
   refreshToken String?
 
   title                UserType       @relation(fields: [titleName], references: [name])
@@ -46,6 +50,8 @@ model Cachier {
   name         String
   email        String  @unique
   password     String
+  address      String?
+  phoneNumber  String?
   refreshToken String?
 
   title                UserType      @relation(fields: [titleName], references: [name])
@@ -63,6 +69,8 @@ model Customer {
   name         String
   email        String  @unique
   password     String
+  address      String?
+  phoneNumber  String?
   refreshToken String?
 
   title     UserType @relation(fields: [titleName], references: [name])

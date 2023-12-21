@@ -103,6 +103,8 @@ const loginSystemAdmin = async (req: Request, res: Response) => {
         titleName: true,
         password: true,
         creator: true,
+        address: true,
+        phoneNumber: true,
       },
     });
     if (!systemAdmin) {
@@ -199,6 +201,9 @@ const refreshToken = async (req: Request, res: Response) => {
         name: true,
         email: true,
         titleName: true,
+        address: true,
+        phoneNumber: true,
+        creator: true,
       },
     });
 
@@ -219,6 +224,8 @@ const refreshToken = async (req: Request, res: Response) => {
       name: systemAdmin.name,
       email: systemAdmin.email,
       title: systemAdmin.titleName,
+      address: systemAdmin.address,
+      phoneNumber: systemAdmin.phoneNumber,
       accessToken,
     });
   } catch (error) {
@@ -235,7 +242,13 @@ const updateSystemAdmin = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Please provide data to us.' });
     }
 
-    const allowedEntery = ['name', 'email', 'password'];
+    const allowedEntery = [
+      'name',
+      'email',
+      'password',
+      'address',
+      'phoneNumber',
+    ];
 
     // Check if the enteries are valid
     const isValidOperation = enteries.every((entery) => {

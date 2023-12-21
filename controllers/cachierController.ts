@@ -42,6 +42,8 @@ const loginCachier = async (req: Request, res: Response) => {
         titleName: true,
         associatedPharmacy: true,
         password: true,
+        address: true,
+        phoneNumber: true,
       },
     });
     if (!cachier) {
@@ -120,6 +122,8 @@ const refreshToken = async (req: Request, res: Response) => {
         email: true,
         titleName: true,
         associatedPharmacy: true,
+        address: true,
+        phoneNumber: true,
       },
     });
 

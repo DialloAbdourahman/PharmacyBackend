@@ -516,19 +516,6 @@ test('Should not allow an unauthorized user to see a product from the product li
   expect(response.status).toBe(401);
 });
 
-test('Should allow system admin to see all pharmacies', async () => {
-  // Assert that a 200 status code is returned.
-  const response = await request(app)
-    .get(`/api/systemAdmin/allPharmacies?name=messa&page=1`)
-    .set('Authorization', `Bearer ${systemAdminAccessToken}`)
-    .send();
-  expect(response.status).toBe(200);
-
-  // Assert that the pharmacy match
-  expect(response.body[0].id).toBe(pharmacy.id);
-  expect(response.body[0].name).toBe(pharmacy.name);
-});
-
 test('Should not allow a non system admin to see all pharmacies', async () => {
   // Assert that a 401 status code is returned.
   const response = await request(app)

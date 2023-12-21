@@ -91,6 +91,8 @@ const loginCustomer = async (req: Request, res: Response) => {
         email: true,
         titleName: true,
         password: true,
+        address: true,
+        phoneNumber: true,
       },
     });
     if (!customer) {
@@ -190,6 +192,8 @@ const refreshToken = async (req: Request, res: Response) => {
         name: true,
         email: true,
         titleName: true,
+        address: true,
+        phoneNumber: true,
       },
     });
 
