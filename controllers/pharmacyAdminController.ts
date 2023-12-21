@@ -182,7 +182,14 @@ const updateInformation = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Please provide data to us.' });
     }
 
-    const allowedEntery = ['name', 'email', 'password'];
+    const allowedEntery = [
+      'name',
+      'email',
+      'password',
+      'address',
+      'phoneNumber',
+      'oldPassword',
+    ];
 
     // Check if the enteries are valid
     const isValidOperation = enteries.every((entery) => {
@@ -197,10 +204,56 @@ const updateInformation = async (req: Request, res: Response) => {
       return;
     }
 
-    // Check if the password should be updated and then encrypt it.
+    // Check if the email is to be updated.
+    const emailUpdate = enteries.find((entery) => entery === 'email');
+    if (emailUpdate) {
+      if (!validator.isEmail(req.body.email)) {
+        return res.status(400).json({ message: 'Invalid Email' });
+      }
+    }
+
+    // Check if the password is to be updated.
     const passwordUpdate = enteries.find((entery) => entery === 'password');
+    const oldPassword = enteries.find((entery) => entery === 'oldPassword');
     if (passwordUpdate) {
+      // Check if the old password has been provided.
+
+      if (!oldPassword) {
+        return res.status(400).json({
+          message:
+            'To update the password, you need to provide the old password.',
+        });
+      }
+
+      // Get the db password.
+      const dbPassword = await prisma.pharmacyAdmin.findUnique({
+        where: { id: req.user.id },
+        select: {
+          password: true,
+        },
+      });
+
+      // Check if the old password is equal to the db password
+      const isMatch = await bcrypt.compare(
+        req.body.oldPassword,
+        dbPassword?.password
+      );
+      if (!isMatch) {
+        return res
+          .status(400)
+          .json({ message: 'The old password does not match' });
+      }
+
+      // Remove the old password field
+      req.body.oldPassword = undefined;
+
+      // Set the hash new password
       req.body.password = await bcrypt.hash(req.body.password, 8);
+    }
+
+    // Make sure that the old password field is not there when a password is not updated.
+    if (!passwordUpdate && oldPassword) {
+      req.body.oldPassword = undefined;
     }
 
     // Update the pharmacy admin's information.
