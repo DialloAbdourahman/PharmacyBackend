@@ -91,6 +91,8 @@ const loginPharmacyAdmin = async (req: Request, res: Response) => {
       name: pharmacyAdmin.name,
       email: pharmacyAdmin.email,
       title: pharmacyAdmin.titleName,
+      address: pharmacyAdmin.address,
+      phoneNumber: pharmacyAdmin.phoneNumber,
       accessToken,
     });
   } catch (error) {

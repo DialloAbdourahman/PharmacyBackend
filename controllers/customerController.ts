@@ -140,6 +140,8 @@ const loginCustomer = async (req: Request, res: Response) => {
       name: customer.name,
       email: customer.email,
       title: customer.titleName,
+      address: customer.address,
+      phoneNumber: customer.phoneNumber,
       accessToken,
     });
   } catch (error) {

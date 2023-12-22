@@ -149,6 +149,8 @@ const loginSystemAdmin = async (req: Request, res: Response) => {
       name: systemAdmin.name,
       email: systemAdmin.email,
       title: systemAdmin.titleName,
+      address: systemAdmin.address,
+      phoneNumber: systemAdmin.phoneNumber,
       accessToken,
     });
   } catch (error) {

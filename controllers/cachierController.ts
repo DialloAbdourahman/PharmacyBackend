@@ -88,6 +88,8 @@ const loginCachier = async (req: Request, res: Response) => {
       name: cachier.name,
       email: cachier.email,
       title: cachier.titleName,
+      address: cachier.address,
+      phoneNumber: cachier.phoneNumber,
       accessToken,
     });
   } catch (error) {
