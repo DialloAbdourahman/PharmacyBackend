@@ -168,22 +168,22 @@ test('Should not allow an unauthorized user to update his information', async ()
 test('Should allow a customer to see all his orders.', async () => {
   // Assert that a 200 status code is returned.
   const response = await request(app)
-    .get(`/api/customer/orders`)
+    .get(`/api/customer/orders?page=1`)
     .set('Authorization', `Bearer ${customerAccessToken}`)
     .send();
   expect(response.status).toBe(200);
 
   // Assert that the data matches
-  expect(response.body[0].id).toBe(orderTwo.id);
-  expect(response.body[0].orderedProduct.id).toBe(productTwo.id);
-  expect(response.body[1].id).toBe(orderOne.id);
-  expect(response.body[1].orderedProduct.id).toBe(productOne.id);
+  expect(response.body.orders[0].id).toBe(orderTwo.id);
+  expect(response.body.orders[0].orderedProduct.id).toBe(productTwo.id);
+  expect(response.body.orders[1].id).toBe(orderOne.id);
+  expect(response.body.orders[1].orderedProduct.id).toBe(productOne.id);
 });
 
 test('Should not allow a non customer to see all his orders.', async () => {
   // Assert that a 401 status code is returned.
   const response = await request(app)
-    .get(`/api/customer/orders`)
+    .get(`/api/customer/orders?page=1`)
     .set('Authorization', `Bearer ${systemAdminAccessToken}`)
     .send();
   expect(response.status).toBe(401);
@@ -191,7 +191,7 @@ test('Should not allow a non customer to see all his orders.', async () => {
 
 test('Should not allow an unauthenticated user to see all his orders.', async () => {
   // Assert that a 401 status code is returned.
-  const response = await request(app).get(`/api/customer/orders`).send();
+  const response = await request(app).get(`/api/customer/orders?page=1`).send();
   expect(response.status).toBe(401);
 });
 

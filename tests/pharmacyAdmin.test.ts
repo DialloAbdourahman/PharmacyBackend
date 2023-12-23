@@ -424,8 +424,10 @@ test('Should allow a pharmacy admin to see all his products.', async () => {
   expect(response.status).toBe(200);
 
   // Assert that the data matches
-  expect(response.body[0].id).toBe(productTwo.id);
-  expect(response.body[0].productList.name).toBe(productListPenicillin.name);
+  expect(response.body.products[0].id).toBe(productTwo.id);
+  expect(response.body.products[0].productList.name).toBe(
+    productListPenicillin.name
+  );
 });
 
 test('Should not allow a non pharmacy admin to see all his products.', async () => {
@@ -479,15 +481,15 @@ test('Should not allow an unauthenticated user to see a product.', async () => {
 test('Should allow a pharmacy admin to see all his orders.', async () => {
   // Assert that a 200 status code is returned.
   const response = await request(app)
-    .get(`/api/pharmacyAdmin/seeAllOrders`)
+    .get(`/api/pharmacyAdmin/seeAllOrders?page=1`)
     .set('Authorization', `Bearer ${pharmacyAdminAccessToken}`)
     .send();
   expect(response.status).toBe(200);
 
   // Assert that the data matches
-  expect(response.body[0].id).toBe(orderOne.id);
-  expect(response.body[0].productId).toBe(productOne.id);
-  expect(response.body[0].customerId).toBe(customer.id);
+  expect(response.body.orders[0].id).toBe(orderOne.id);
+  expect(response.body.orders[0].productId).toBe(productOne.id);
+  expect(response.body.orders[0].customerId).toBe(customer.id);
 });
 
 test('Should not allow a non pharmacy admin to see all his orders.', async () => {
@@ -510,15 +512,15 @@ test('Should not allow an unauthenticated user to see all his orders.', async ()
 test('Should allow a pharmacy admin to see all his sales.', async () => {
   // Assert that a 200 status code is returned.
   const response = await request(app)
-    .get(`/api/pharmacyAdmin/seeAllSales`)
+    .get(`/api/pharmacyAdmin/seeAllSales?page=1`)
     .set('Authorization', `Bearer ${pharmacyAdminAccessToken}`)
     .send();
   expect(response.status).toBe(200);
 
   // Assert that the data matches
-  expect(response.body[0].id).toBe(saleOne.id);
-  expect(response.body[0].productId).toBe(productOne.id);
-  expect(response.body[0].cachierId).toBe(cachier.id);
+  expect(response.body.sales[0].id).toBe(saleOne.id);
+  expect(response.body.sales[0].productId).toBe(productOne.id);
+  expect(response.body.sales[0].cachierId).toBe(cachier.id);
 });
 
 test('Should not allow a non pharmacy admin to see all his sales.', async () => {
@@ -547,8 +549,8 @@ test('Should allow pharmacy admin to see all products from product list', async 
   expect(response.status).toBe(200);
 
   // Assert that the products match
-  expect(response.body[0].id).toBe(productListPenicillin.id);
-  expect(response.body[0].name).toBe(productListPenicillin.name);
+  expect(response.body.products[0].id).toBe(productListPenicillin.id);
+  expect(response.body.products[0].name).toBe(productListPenicillin.name);
 });
 
 test('Should not allow an unauthorized user to see the product list.', async () => {
