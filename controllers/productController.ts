@@ -52,8 +52,12 @@ const getProducts = async (req: Request, res: Response) => {
       };
     });
 
+    // Count the number of pages
+    let count = await prisma.productList.count();
+    count = Math.ceil(count / itemPerPage);
+
     // Send back a positive response.
-    res.status(200).json(productsWithCorrectImageUrl);
+    res.status(200).json({ productsWithCorrectImageUrl, count });
   } catch (error) {
     res.status(500).json({ message: 'Something went wrong.', error });
   }

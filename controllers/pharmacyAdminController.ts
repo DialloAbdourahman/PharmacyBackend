@@ -632,8 +632,12 @@ const seeOurProducts = async (req: Request, res: Response) => {
       },
     });
 
+    // Count the number of pages
+    let count = await prisma.productList.count();
+    count = Math.ceil(count / itemPerPage);
+
     // Send back a positive response.
-    res.status(200).json(products);
+    res.status(200).json({ products, count });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
@@ -664,8 +668,17 @@ const seeOneOFOurProduct = async (req: Request, res: Response) => {
 
 const seeAllOrders = async (req: Request, res: Response) => {
   try {
+    // Get relevant data from request query
+    let page: number = Number(req.query.page);
+
+    // Configure the pages. Here, the first page will be 1.
+    const itemPerPage = 10;
+    page = page - 1;
+
     // Get all the orders from db
     const orders = await prisma.order.findMany({
+      take: itemPerPage,
+      skip: itemPerPage * page,
       where: {
         orderedProduct: {
           pharmacy: {
@@ -675,8 +688,12 @@ const seeAllOrders = async (req: Request, res: Response) => {
       },
     });
 
+    // Count the number of pages
+    let count = await prisma.productList.count();
+    count = Math.ceil(count / itemPerPage);
+
     // Send back a positive response.
-    res.status(200).json(orders);
+    res.status(200).json({ orders, count });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
@@ -684,8 +701,17 @@ const seeAllOrders = async (req: Request, res: Response) => {
 
 const seeAllSales = async (req: Request, res: Response) => {
   try {
+    // Get relevant data from request query
+    let page: number = Number(req.query.page);
+
+    // Configure the pages. Here, the first page will be 1.
+    const itemPerPage = 10;
+    page = page - 1;
+
     // Get the sales from the db.
     const sales = await prisma.sale.findMany({
+      take: itemPerPage,
+      skip: itemPerPage * page,
       where: {
         soldProduct: {
           pharmacy: {
@@ -695,8 +721,12 @@ const seeAllSales = async (req: Request, res: Response) => {
       },
     });
 
+    // Count the number of pages
+    let count = await prisma.productList.count();
+    count = Math.ceil(count / itemPerPage);
+
     // Send back a positive response
-    res.status(200).json(sales);
+    res.status(200).json({ sales, count });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }

@@ -483,8 +483,8 @@ test('Should allow system admin to see all products from product list', async ()
   expect(response.status).toBe(200);
 
   // Assert that the products match
-  expect(response.body[0].id).toBe(productListPenicillin.id);
-  expect(response.body[0].name).toBe(productListPenicillin.name);
+  expect(response.body.products[0].id).toBe(productListPenicillin.id);
+  expect(response.body.products[0].name).toBe(productListPenicillin.name);
 });
 
 test('Should not allow an unauthorized user to see the product list.', async () => {

@@ -455,8 +455,17 @@ const updateAccount = async (req: Request, res: Response) => {
 
 const seeOrders = async (req: Request, res: Response) => {
   try {
+    // Get relevant data from request query
+    let page: number = Number(req.query.page);
+
+    // Configure the pages. Here, the first page will be 1.
+    const itemPerPage = 10;
+    page = page - 1;
+
     // Get the orders from db.
     const orders = await prisma.order.findMany({
+      take: itemPerPage,
+      skip: itemPerPage * page,
       where: {
         customerId: req.user.id,
       },
@@ -482,8 +491,12 @@ const seeOrders = async (req: Request, res: Response) => {
       },
     });
 
+    // Count the number of pages
+    let count = await prisma.productList.count();
+    count = Math.ceil(count / itemPerPage);
+
     // Send back a positive response to the customer
-    res.status(200).json(orders);
+    res.status(200).json({ orders, count });
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong.', error });
   }
