@@ -43,10 +43,18 @@ test('should allow any user to search for products with localization', async () 
   expect(response.status).toBe(200);
 
   // Assert that the data matches
-  expect(response.body[0].productid).toBe(productFour.id);
-  expect(response.body[0].productname).toBe(productListPenicillin.name);
-  expect(response.body[0].pharmacyname).toBe(pharmacyTwo.name);
-  expect(response.body[0].distance_m).toBe(907.0432320154484);
+  expect(response.body.productsWithCorrectImageUrl[0].productid).toBe(
+    productFour.id
+  );
+  expect(response.body.productsWithCorrectImageUrl[0].productname).toBe(
+    productListPenicillin.name
+  );
+  expect(response.body.productsWithCorrectImageUrl[0].pharmacyname).toBe(
+    pharmacyTwo.name
+  );
+  expect(response.body.productsWithCorrectImageUrl[0].distance_m).toBe(
+    907.0432320154484
+  );
 });
 
 test('should allow any user to search for products with no localization', async () => {
@@ -64,9 +72,13 @@ test('should allow any user to search for products with no localization', async 
   expect(response.status).toBe(200);
 
   // Assert that the data matches
-  expect(response.body.length).toBe(2);
-  expect(response.body[0].productname).toBe(productListPenicillin.name);
-  expect(response.body[1].productname).toBe(productListPenicillin.name);
+  expect(response.body.productsWithCorrectImageUrl.length).toBe(2);
+  expect(response.body.productsWithCorrectImageUrl[0].productname).toBe(
+    productListPenicillin.name
+  );
+  expect(response.body.productsWithCorrectImageUrl[1].productname).toBe(
+    productListPenicillin.name
+  );
 });
 
 test('should allow any user to search for products with no localization but with a category', async () => {
@@ -84,7 +96,11 @@ test('should allow any user to search for products with no localization but with
   expect(response.status).toBe(200);
 
   // Assert that the data matches
-  expect(response.body.length).toBe(2);
-  expect(response.body[0].productname).toBe(productListPenicillin.name);
-  expect(response.body[1].productname).toBe(productListPenicillin.name);
+  expect(response.body.productsWithCorrectImageUrl.length).toBe(2);
+  expect(response.body.productsWithCorrectImageUrl[0].productname).toBe(
+    productListPenicillin.name
+  );
+  expect(response.body.productsWithCorrectImageUrl[1].productname).toBe(
+    productListPenicillin.name
+  );
 });

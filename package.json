@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "dev": "nodemon src/index.ts",
+    "start": "node api.js && ts-node src/index.ts",
+    "dev": "node api.js && nodemon src/index.ts",
     "test": "jest --watchAll --runInBand",
     "initialize": "ts-node src/initialize.ts"
   },

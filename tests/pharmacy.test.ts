@@ -18,9 +18,9 @@ test('should allow any user to see all the pharmacies', async () => {
   expect(response.status).toBe(200);
 
   // Assert that the data matches
-  expect(response.body[0].id).toBe(pharmacy.id);
-  expect(response.body[0].name).toBe(pharmacy.name);
-  expect(response.body[0].email).toBe(pharmacy.email);
+  expect(response.body.pharmacies[0].id).toBe(pharmacy.id);
+  expect(response.body.pharmacies[0].name).toBe(pharmacy.name);
+  expect(response.body.pharmacies[0].email).toBe(pharmacy.email);
 });
 
 test('should allow any user to see a pharmacy information', async () => {
